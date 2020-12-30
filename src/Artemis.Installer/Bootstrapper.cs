@@ -1,4 +1,5 @@
-﻿using Artemis.Installer.Screens;
+﻿using System.Linq;
+using Artemis.Installer.Screens;
 using Artemis.Installer.Screens.Steps;
 using Artemis.Installer.Services;
 using Artemis.Installer.Services.Prerequisites;
@@ -19,16 +20,27 @@ namespace Artemis.Installer
             // View related stuff
             builder.Bind<ConfigurationStep>().ToAllImplementations();
             builder.Bind(typeof(IPrerequisite)).ToAllImplementations();
-            
+
             // Services
             builder.Bind<IInstallationService>().To<InstallationService>().InSingletonScope();
-            
+
             // Validation
             builder.Bind(typeof(IModelValidator<>)).To(typeof(FluentValidationAdapter<>));
             builder.Bind(typeof(IValidator<>)).ToAllImplementations();
-            
+
             base.ConfigureIoC(builder);
         }
+
+        #region Overrides of BootstrapperBase
+
+        /// <inheritdoc />
+        protected override void Configure()
+        {
+            Container.Get<IInstallationService>().Args = Args.ToList();
+            base.Configure();
+        }
+
+        #endregion
 
         #endregion
     }

@@ -20,7 +20,7 @@
                 This wizard will install or update Artemis for you, ensuring you have the latest version.<LineBreak />
             </TextBlock>
             <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" TextWrapping="Wrap">
-                In order to do this, the installer requires an active internet connection to download the latest program files. <LineBreak/>
+                In order to do this, the installer requires an active internet connection to download the latest program files. <LineBreak />
                 Click continue to get started!
             </TextBlock>
             <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Foreground="{DynamicResource MaterialDesignBodyLight}" TextWrapping="Wrap">

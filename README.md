@@ -1,6 +1,6 @@
 # Artemis Installer fetcher
 [![GitHub license](https://img.shields.io/badge/license-noncommercial-blue.svg)](https://github.com/SpoinkyNL/Artemis/blob/master/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/Artemis-RGB/Artemis.Plugins.svg)](https://github.com/Artemis-RGB/Artemis.Builds/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/Artemis-RGB/Artemis.Installer.svg)](https://github.com/Artemis-RGB/Artemis.Installer/stargazers)
 [![Discord](https://img.shields.io/discord/392093058352676874?logo=discord&logoColor=white)](https://discord.gg/S3MVaC9) 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VQBAEJYUFLU4J) 
 

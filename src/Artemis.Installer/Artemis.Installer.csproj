@@ -83,6 +83,16 @@
     </ApplicationDefinition>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
+    <Compile Include="Extensions\HttpClientExtensions.cs" />
+    <Compile Include="Extensions\StreamExtensions.cs" />
+    <Compile Include="Screens\AttendedView.xaml.cs">
+      <DependentUpon>AttendedView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\AttendedViewModel.cs" />
+    <Compile Include="Screens\UnattendedView.xaml.cs">
+      <DependentUpon>UnattendedView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\UnattendedViewModel.cs" />
     <Compile Include="Services\Prerequisites\RedistPrerequisite.cs" />
     <Compile Include="Services\Prerequisites\DotnetPrerequisite.cs" />
     <Compile Include="Services\Prerequisites\Interface\IPrerequisite.cs" />
@@ -112,7 +122,12 @@
     <Compile Include="Services\IIInstallationService.cs" />
     <Compile Include="Services\InstallationService.cs" />
     <Compile Include="Stylet\FluentValidationAdapter.cs" />
+    <Compile Include="Utilities\IDownloadable.cs" />
     <Compile Include="Utilities\ProcessUtilities.cs" />
+    <Page Include="Screens\AttendedView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Screens\RootView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -136,6 +151,10 @@
     <Page Include="Screens\Steps\WelcomeStepView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Screens\UnattendedView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

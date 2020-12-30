@@ -16,52 +16,9 @@
                     FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
                     UseLayoutRounding="True"
                     Height="550" Width="800"
-                    ResizeMode="NoResize">
-    <materialDesign:DialogHost IsTabStop="False"
-                               Focusable="False"
-                               Identifier="RootDialog"
-                               DialogTheme="Inherit">
-        <mde:Stepper IsLinear="True" Layout="Horizontal" ActiveStepChanged="{s:Action ActiveStepChanged}" CancelNavigation="{s:Action Cancel}" Margin="15">
-            <mde:Step>
-                <mde:Step.Header>
-                    <mde:StepTitleHeader FirstLevelTitle="Welcome" />
-                </mde:Step.Header>
-                <mde:Step.Content>
-                    <ContentControl s:View.Model="{Binding ActiveItem}" />
-                </mde:Step.Content>
-            </mde:Step>   
-            <mde:Step>
-                <mde:Step.Header>
-                    <mde:StepTitleHeader FirstLevelTitle="Prerequisites" />
-                </mde:Step.Header>
-                <mde:Step.Content>
-                    <ContentControl s:View.Model="{Binding ActiveItem}" />
-                </mde:Step.Content>
-            </mde:Step>
-            <mde:Step>
-                <mde:Step.Header>
-                    <mde:StepTitleHeader FirstLevelTitle="Directory" />
-                </mde:Step.Header>
-                <mde:Step.Content>
-                    <ContentControl s:View.Model="{Binding ActiveItem}" />
-                </mde:Step.Content>
-            </mde:Step>
-            <mde:Step>
-                <mde:Step.Header>
-                    <mde:StepTitleHeader FirstLevelTitle="Install" />
-                </mde:Step.Header>
-                <mde:Step.Content>
-                    <ContentControl s:View.Model="{Binding ActiveItem}" />
-                </mde:Step.Content>
-            </mde:Step>
-            <mde:Step>
-                <mde:Step.Header>
-                    <mde:StepTitleHeader FirstLevelTitle="Finish" />
-                </mde:Step.Header>
-                <mde:Step.Content>
-                    <ContentControl s:View.Model="{Binding ActiveItem}" />
-                </mde:Step.Content>
-            </mde:Step>
-        </mde:Stepper>
+                    ResizeMode="NoResize"
+                    d:DataContext="{d:DesignInstance local:RootViewModel}">
+    <materialDesign:DialogHost IsTabStop="False" Focusable="False" Identifier="RootDialog" DialogTheme="Inherit">
+        <ContentControl s:View.Model="{Binding ActiveItem}" />
     </materialDesign:DialogHost>
 </mde:MaterialWindow>

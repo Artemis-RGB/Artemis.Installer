@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Linq;
-using System.Net;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Artemis.Installer.Screens.Steps.Prerequisites;
 using Artemis.Installer.Services;
@@ -14,15 +12,14 @@ namespace Artemis.Installer.Screens.Steps
 
         private bool _displayDownloadButton;
         private bool _displayProcess;
-        private double _downloadCurrent;
-        private int _downloadProcess;
-        private double _downloadTotal;
-        private bool _installing;
+
         private PrerequisiteViewModel _subject;
 
         public PrerequisitesStepViewModel(IInstallationService installationService)
         {
-            Prerequisites = new BindableCollection<PrerequisiteViewModel>(installationService.Prerequisites.Select(p => new PrerequisiteViewModel(p)));
+            Prerequisites = new BindableCollection<PrerequisiteViewModel>(installationService.Prerequisites.Select(p => new PrerequisiteViewModel(installationService, p)));
+            foreach (PrerequisiteViewModel prerequisiteViewModel in Prerequisites)
+                prerequisiteViewModel.ConductWith(this);
         }
 
         public BindableCollection<PrerequisiteViewModel> Prerequisites { get; }
@@ -51,30 +48,6 @@ namespace Artemis.Installer.Screens.Steps
             set => SetAndNotify(ref _displayProcess, value);
         }
 
-        public bool Installing
-        {
-            get => _installing;
-            set => SetAndNotify(ref _installing, value);
-        }
-
-        public int DownloadProcess
-        {
-            get => _downloadProcess;
-            set => SetAndNotify(ref _downloadProcess, value);
-        }
-
-        public double DownloadCurrent
-        {
-            get => _downloadCurrent;
-            set => SetAndNotify(ref _downloadCurrent, value);
-        }
-
-        public double DownloadTotal
-        {
-            get => _downloadTotal;
-            set => SetAndNotify(ref _downloadTotal, value);
-        }
-
         public override int Order => 2;
 
         public void Update()
@@ -83,51 +56,34 @@ namespace Artemis.Installer.Screens.Steps
                 prerequisiteViewModel.Update();
 
             CanContinue = Prerequisites.All(p => p.IsMet);
-            DisplayDownloadButton = !DisplayProcess && Prerequisites.Any(p => !p.IsMet);
+
+            DisplayDownloadButton = Subject == null;
+            DisplayProcess = Subject != null;
         }
 
         public async Task InstallMissing()
         {
-            DisplayDownloadButton = false;
-            DisplayProcess = true;
-
             foreach (PrerequisiteViewModel prerequisiteViewModel in Prerequisites)
             {
-                if (prerequisiteViewModel.IsMet) continue;
-                using (WebClient client = new WebClient())
-                {
-                    Subject = prerequisiteViewModel;
+                if (prerequisiteViewModel.IsMet)
+                    continue;
 
-                    client.DownloadProgressChanged += ClientOnDownloadProgressChanged;
-                    string runtimeFile = Path.GetTempFileName();
-                    runtimeFile = runtimeFile.Replace(".tmp", ".exe");
-                    await client.DownloadFileTaskAsync(prerequisiteViewModel.Prerequisite.DownloadUrl, runtimeFile);
-                    client.DownloadProgressChanged -= ClientOnDownloadProgressChanged;
-
-                    Installing = true;
-                    await prerequisiteViewModel.Prerequisite.Install(runtimeFile);
-                    File.Delete(runtimeFile);
-                    Installing = false;
-                }
-
+                Subject = prerequisiteViewModel;
                 Update();
+
+                string file = await prerequisiteViewModel.Download();
+                Update();
+                await prerequisiteViewModel.Install(file);
             }
 
-            DisplayProcess = false;
-            DisplayDownloadButton = Prerequisites.Any(p => !p.IsMet);
+            Subject = null;
+            Update();
         }
 
         protected override void OnActivate()
         {
             Update();
             base.OnActivate();
-        }
-        
-        private void ClientOnDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        {
-            DownloadTotal = e.TotalBytesToReceive / 1000000d;
-            DownloadCurrent = e.BytesReceived / 1000000d;
-            DownloadProcess = e.ProgressPercentage;
         }
     }
 }

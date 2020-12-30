@@ -1,34 +1,39 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Artemis.Installer.Screens.Steps;
-using MaterialDesignExtensions.Controllers;
-using MaterialDesignExtensions.Controls;
+﻿using Artemis.Installer.Services;
 using Stylet;
 
 namespace Artemis.Installer.Screens
 {
-    public class RootViewModel : Conductor<ConfigurationStep>.Collection.OneActive
+    public class RootViewModel : Conductor<Screen>
     {
-        private StepperController _stepperController;
+        private readonly AttendedViewModel _attendedViewModel;
+        private readonly IInstallationService _installationService;
+        private readonly UnattendedViewModel _unattendedViewModel;
 
-        public RootViewModel(IEnumerable<ConfigurationStep> configurationSteps)
+        public RootViewModel(IInstallationService installationService, AttendedViewModel attendedViewModel,
+            UnattendedViewModel unattendedViewModel)
         {
-            Items.AddRange(configurationSteps.OrderBy(s => s.Order));
+            _installationService = installationService;
+            _attendedViewModel = attendedViewModel;
+            _unattendedViewModel = unattendedViewModel;
         }
 
-        public void ActiveStepChanged(object sender, ActiveStepChangedEventArgs e)
-        {
-            Stepper stepper = (Stepper) sender;
-            _stepperController = stepper.Controller;
+        #region Overrides of Screen
 
-            int activeStepIndex = stepper.Steps.IndexOf(e.Step);
-            if (Items.Count > activeStepIndex)
-                ActiveItem = Items[activeStepIndex];
+        /// <inheritdoc />
+        protected override void OnInitialActivate()
+        {
+            if (_installationService.IsUnattended)
+                ActiveItem = _unattendedViewModel;
             else
-                _stepperController.Back();
+                ActiveItem = _attendedViewModel;
+
+            ActiveItem.Closed += ActiveItemOnClosed;
+            base.OnInitialActivate();
         }
 
-        public void Cancel()
+        #endregion
+
+        private void ActiveItemOnClosed(object sender, CloseEventArgs e)
         {
             RequestClose();
         }

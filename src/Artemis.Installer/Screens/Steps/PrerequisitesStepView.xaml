@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:steps="clr-namespace:Artemis.Installer.Screens.Steps"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:s="https://github.com/canton7/Stylet"
              xmlns:mde="https://spiegelp.github.io/MaterialDesignExtensions/winfx/xaml"
              mc:Ignorable="d"
@@ -26,24 +25,25 @@
         <ItemsControl Grid.Row="1" ItemsSource="{Binding Prerequisites}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <ContentControl s:View.Model="{Binding}" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" IsTabStop="False"/>
+                    <ContentControl s:View.Model="{Binding}" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" IsTabStop="False" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
-        <Grid Grid.Row="2" Margin="0 25">
-            <Button Style="{StaticResource MaterialDesignRaisedButton}" 
-                    Width="300" 
-                    Visibility="{Binding DisplayDownloadButton, Converter={x:Static s:BoolToVisibilityConverter.Instance}}" 
+        <Grid Grid.Row="2" Margin="0 25" Visibility="{Binding CanContinue, Converter={x:Static s:BoolToVisibilityConverter.InverseInstance}}">
+            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                    Width="300"
+                    Visibility="{Binding DisplayDownloadButton, Converter={x:Static s:BoolToVisibilityConverter.Instance}}"
                     Command="{s:Action InstallMissing}">
                 Download missing prerequisites
             </Button>
             <StackPanel Visibility="{Binding DisplayProcess, Converter={x:Static s:BoolToVisibilityConverter.Instance}}">
-                <ProgressBar Value="{Binding DownloadProcess}" IsIndeterminate="{Binding Installing}" />
-                <TextBlock Margin="0 10" Visibility="{Binding Installing, Converter={x:Static s:BoolToVisibilityConverter.InverseInstance}}">
-                    Downloading <Run FontWeight="Bold" Text="{Binding Subject.Title}" /> <Run Text="{Binding DownloadCurrent, StringFormat=N2}" />/<Run Text="{Binding DownloadTotal, StringFormat=N2}" /> MB.
-                </TextBlock>       
-                <TextBlock Margin="0 10" Visibility="{Binding Installing, Converter={x:Static s:BoolToVisibilityConverter.Instance}}">
+                <ProgressBar Value="{Binding Subject.DownloadPercentage, Mode=OneWay}" IsIndeterminate="{Binding Subject.IsInstalling}" />
+                <TextBlock Margin="0 10" Visibility="{Binding Subject.IsInstalling, Converter={x:Static s:BoolToVisibilityConverter.InverseInstance}}">
+                    Downloading <Run FontWeight="Bold" Text="{Binding Subject.Title}" /> <Run Text="{Binding Subject.DownloadCurrent, StringFormat=N2, Mode=OneWay}" />/
+                    <Run Text="{Binding Subject.DownloadTotal, StringFormat=N2, Mode=OneWay}" /> MB.
+                </TextBlock>
+                <TextBlock Margin="0 10" Visibility="{Binding Subject.IsInstalling, Converter={x:Static s:BoolToVisibilityConverter.Instance}}">
                     Installing <Run FontWeight="Bold" Text="{Binding Subject.Title}" />.
                 </TextBlock>
             </StackPanel>

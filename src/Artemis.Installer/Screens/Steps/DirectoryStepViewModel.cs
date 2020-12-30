@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 using Artemis.Installer.Services;
 using FluentValidation;
 using Ookii.Dialogs.Wpf;
@@ -39,7 +38,7 @@ namespace Artemis.Installer.Screens.Steps
                 UseDescriptionForTitle = true
             };
 
-            if (dialog.ShowDialog() is bool accepted && accepted) 
+            if (dialog.ShowDialog() is bool accepted && accepted)
                 InstallationDirectory = Path.Combine(dialog.SelectedPath, "Artemis");
         }
 

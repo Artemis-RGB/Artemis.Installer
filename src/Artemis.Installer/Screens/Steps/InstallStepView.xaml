@@ -11,15 +11,34 @@
              d:DataContext="{d:DesignInstance steps:InstallStepViewModel}">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Margin="0 25">
+        <TextBlock Grid.Row="0" Style="{StaticResource MaterialDesignBody1TextBlock}" TextWrapping="Wrap">
+            The installer is downloading the Artemis files and installing them for you...
+        </TextBlock>
+
+        <StackPanel Grid.Row="1">
+            <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Foreground="{DynamicResource MaterialDesignBodyLight}" TextWrapping="Wrap">
+                While installing please enjoy your complementary dad joke
+            </TextBlock>
+
+            <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}"
+                       Foreground="{DynamicResource MaterialDesignBodyLight}"
+                       TextWrapping="Wrap"
+                       FontWeight="Bold"
+                       Text="{Binding DadJoke}" />
+        </StackPanel>
+
+        <Grid Grid.Row="2" Margin="0 25">
             <StackPanel>
                 <ProgressBar Value="{Binding DownloadProcess}" IsIndeterminate="{Binding IsIndeterminate}" />
                 <TextBlock Margin="0 10" Visibility="{Binding Installing, Converter={x:Static s:BoolToVisibilityConverter.InverseInstance}}">
-                    Downloading <Run Text="{Binding DownloadCurrent, StringFormat=N2}" />/<Run Text="{Binding DownloadTotal, StringFormat=N2}" /> MB.
+                    Downloading <Run Text="{Binding DownloadCurrent, StringFormat=N2}" />/
+                    <Run Text="{Binding DownloadTotal, StringFormat=N2}" /> MB.
                 </TextBlock>
                 <TextBlock Margin="0 10" Visibility="{Binding Installing, Converter={x:Static s:BoolToVisibilityConverter.Instance}}">
                     Installing <Run FontWeight="Bold" Text="{Binding Subject.Title}" />.
@@ -27,7 +46,7 @@
             </StackPanel>
         </Grid>
 
-        <mde:StepButtonBar Grid.Row="1"
+        <mde:StepButtonBar Grid.Row="3"
                            Grid.ColumnSpan="2"
                            VerticalAlignment="Bottom"
                            Continue="CONTINUE"
