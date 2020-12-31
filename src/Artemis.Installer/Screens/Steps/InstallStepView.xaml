@@ -48,7 +48,7 @@
                            Grid.ColumnSpan="2"
                            VerticalAlignment="Bottom"
                            Continue="CONTINUE"
-                           Back="BACK"
+                           IsBackEnabled="False"
                            IsContinueEnabled="{Binding CanContinue}" />
     </Grid>
 </UserControl>

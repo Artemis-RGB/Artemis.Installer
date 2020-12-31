@@ -95,14 +95,10 @@
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Extensions\HttpClientExtensions.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
-    <Compile Include="Screens\AttendedView.xaml.cs">
-      <DependentUpon>AttendedView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Screens\AttendedViewModel.cs" />
-    <Compile Include="Screens\UnattendedView.xaml.cs">
-      <DependentUpon>UnattendedView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Screens\UnattendedViewModel.cs" />
+    <Compile Include="Screens\InstallViewModel.cs" />
+    <Compile Include="Screens\ModifyViewModel.cs" />
+    <Compile Include="Screens\AttendedViewModel.cs" />
     <Compile Include="Services\Prerequisites\RedistPrerequisite.cs" />
     <Compile Include="Services\Prerequisites\DotnetPrerequisite.cs" />
     <Compile Include="Services\Prerequisites\Interface\IPrerequisite.cs" />
@@ -135,6 +131,14 @@
     <Compile Include="Utilities\IDownloadable.cs" />
     <Compile Include="Utilities\ProcessUtilities.cs" />
     <Page Include="Screens\AttendedView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Screens\InstallView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Screens\ModifyView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

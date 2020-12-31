@@ -1,35 +1,46 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Artemis.Installer.Screens.Steps;
-using MaterialDesignExtensions.Controllers;
-using MaterialDesignExtensions.Controls;
+﻿using Artemis.Installer.Services;
 using Stylet;
 
 namespace Artemis.Installer.Screens
 {
-    public class AttendedViewModel : Conductor<ConfigurationStep>.Collection.OneActive
+    public class AttendedViewModel : Conductor<Screen>
     {
-        private StepperController _stepperController;
+        private readonly IInstallationService _installationService;
+        private readonly InstallViewModel _installViewModel;
+        private readonly ModifyViewModel _modifyViewModel;
 
-        public AttendedViewModel(IEnumerable<ConfigurationStep> configurationSteps)
+        public AttendedViewModel(IInstallationService installationService, InstallViewModel installViewModel, ModifyViewModel modifyViewModel)
         {
-            Items.AddRange(configurationSteps.OrderBy(s => s.Order));
+            _installationService = installationService;
+            _installViewModel = installViewModel;
+            _modifyViewModel = modifyViewModel;
         }
 
-        public void ActiveStepChanged(object sender, ActiveStepChangedEventArgs e)
+        public void ModifyChoiceSelected()
         {
-            Stepper stepper = (Stepper) sender;
-            _stepperController = stepper.Controller;
-
-            int activeStepIndex = stepper.Steps.IndexOf(e.Step);
-            if (Items.Count > activeStepIndex)
-                ActiveItem = Items[activeStepIndex];
+            if (_modifyViewModel.InstallSelected)
+                ActiveItem = _installViewModel;
+            else if (_modifyViewModel.UninstallSelected)
+                ActiveItem = _installViewModel;
             else
-                _stepperController.Back();
+                RequestClose();
+
+            ActiveItem.Closed += ActiveItemOnClosed;
         }
 
-        public void Cancel()
+        protected override void OnInitialActivate()
         {
+            if (_installationService.GetInstallKey() == null)
+                ActiveItem = _installViewModel;
+            else
+                ActiveItem = _modifyViewModel;
+
+            base.OnInitialActivate();
+        }
+
+        private void ActiveItemOnClosed(object sender, CloseEventArgs e)
+        {
+            ActiveItem.Closed -= ActiveItemOnClosed;
             RequestClose();
         }
     }
