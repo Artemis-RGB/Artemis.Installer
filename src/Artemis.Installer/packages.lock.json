@@ -2,6 +2,12 @@
   "version": 1,
   "dependencies": {
     ".NETFramework,Version=v4.7.2": {
+      "AngleSharp": {
+        "type": "Direct",
+        "requested": "[0.14.0, 0.14.0]",
+        "resolved": "0.14.0",
+        "contentHash": "34w9I7nyszfEYBY8g7T3B0AtWlOivNh+QoWc3KECRwbmcNyqWmb4huihtmpH2Ds7rIRRHMMPv9yfPBxxjBn03g=="
+      },
       "FluentValidation": {
         "type": "Direct",
         "requested": "[9.3.0, 9.3.0]",
@@ -43,6 +49,18 @@
         "requested": "[1.3.5, 1.3.5]",
         "resolved": "1.3.5",
         "contentHash": "UwVT5eTTNWI8a3hiva361UMD/ebmY4pd7c4qtkM9soAGcBavNCrgcxO3IC3+L+1hEcuZqyOqdBLyrT1lOB/M+w=="
+      },
+      "System.Runtime.CompilerServices.Unsafe": {
+        "type": "Direct",
+        "requested": "[4.5.0, 4.5.0]",
+        "resolved": "4.5.0",
+        "contentHash": "YrzNWduCDHhUaSRBxHxL11UkM2fD6y8hITHis4/LbQZ6vj3vdRjoH3IoPWWC9uDXK2wHIqn+b5gv1Np/VKyM1g=="
+      },
+      "System.Text.Encoding.CodePages": {
+        "type": "Direct",
+        "requested": "[4.5.0, 4.5.0]",
+        "resolved": "4.5.0",
+        "contentHash": "S0wEUiKcLvRlkFUXca8uio1UQ5bYQzYgOmOKtCqaBQC3GR9AJjh43otcM32IGsAyvadFTaAMw9Irm6dS4Evfng=="
       }
     }
   }

@@ -9,8 +9,7 @@ namespace Artemis.Installer.Screens
         private readonly IInstallationService _installationService;
         private readonly UnattendedViewModel _unattendedViewModel;
 
-        public RootViewModel(IInstallationService installationService, AttendedViewModel attendedViewModel,
-            UnattendedViewModel unattendedViewModel)
+        public RootViewModel(IInstallationService installationService, AttendedViewModel attendedViewModel, UnattendedViewModel unattendedViewModel)
         {
             _installationService = installationService;
             _attendedViewModel = attendedViewModel;

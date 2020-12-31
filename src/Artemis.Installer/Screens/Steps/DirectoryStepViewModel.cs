@@ -11,6 +11,7 @@ namespace Artemis.Installer.Screens.Steps
     {
         private readonly IInstallationService _installationService;
         private string _installationDirectory;
+        private bool _canBrowseDirectory;
 
         public DirectoryStepViewModel(IInstallationService installationService, IModelValidator<DirectoryStepViewModel> validator) : base(validator)
         {
@@ -27,7 +28,14 @@ namespace Artemis.Installer.Screens.Steps
             }
         }
 
+        public bool CanBrowseDirectory
+        {
+            get => _canBrowseDirectory;
+            set => SetAndNotify(ref _canBrowseDirectory, value);
+        }
+
         public override int Order => 3;
+
 
         public void BrowseDirectory()
         {
@@ -46,6 +54,8 @@ namespace Artemis.Installer.Screens.Steps
         protected override void OnActivate()
         {
             InstallationDirectory = _installationService.InstallationDirectory;
+            CanBrowseDirectory = _installationService.GetInstallKey() == null;
+            
             base.OnActivate();
         }
 
