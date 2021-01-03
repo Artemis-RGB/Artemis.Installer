@@ -1,17 +1,18 @@
 ﻿using System;
 using System.IO;
+using Artemis.Installer.Screens.Abstract;
 using Artemis.Installer.Services;
 using FluentValidation;
 using Ookii.Dialogs.Wpf;
 using Stylet;
 
-namespace Artemis.Installer.Screens.Steps
+namespace Artemis.Installer.Screens.Install.Steps
 {
-    public class DirectoryStepViewModel : ConfigurationStep
+    public class DirectoryStepViewModel : InstallStepViewModel
     {
         private readonly IInstallationService _installationService;
-        private string _installationDirectory;
         private bool _canBrowseDirectory;
+        private string _installationDirectory;
 
         public DirectoryStepViewModel(IInstallationService installationService, IModelValidator<DirectoryStepViewModel> validator) : base(validator)
         {
@@ -55,7 +56,7 @@ namespace Artemis.Installer.Screens.Steps
         {
             InstallationDirectory = _installationService.InstallationDirectory;
             CanBrowseDirectory = _installationService.GetInstallKey() == null;
-            
+
             base.OnActivate();
         }
 

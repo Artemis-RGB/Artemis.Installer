@@ -5,8 +5,8 @@ namespace Artemis.Installer.Screens
 {
     public class RootViewModel : Conductor<Screen>
     {
-        private readonly IInstallationService _installationService;
         private readonly AttendedViewModel _attendedViewModel;
+        private readonly IInstallationService _installationService;
         private readonly UnattendedViewModel _unattendedViewModel;
 
         public RootViewModel(IInstallationService installationService, AttendedViewModel attendedViewModel, UnattendedViewModel unattendedViewModel)

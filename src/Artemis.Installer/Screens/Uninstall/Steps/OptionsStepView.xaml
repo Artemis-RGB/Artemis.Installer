@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="Artemis.Installer.Screens.Uninstall.Steps.OptionsStepView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Artemis.Installer.Screens.Uninstall.Steps"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:mde="https://spiegelp.github.io/MaterialDesignExtensions/winfx/xaml"
+             xmlns:converters="clr-namespace:Artemis.Installer.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Style="{StaticResource MaterialDesignBody1TextBlock}" TextWrapping="Wrap">
+            You are about to remove Artemis from the following directory:
+        </TextBlock>
+
+        <TextBox Grid.Row="1"
+                 Margin="0 10 0 50"
+                 Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
+                 VerticalAlignment="Center"
+                 materialDesign:HintAssist.Hint="Installation directory"
+                 Text="{Binding InstallationDirectory, Mode=OneWay}"
+                 IsEnabled="False" />
+
+        <TextBlock Grid.Row="2" Style="{StaticResource MaterialDesignBody1TextBlock}" TextWrapping="Wrap">
+            Do you also want to remove your settings, profiles and plugins? 
+        </TextBlock>
+
+        <StackPanel Grid.Row="3">
+            <RadioButton Style="{StaticResource MaterialDesignRadioButton}" IsChecked="{Binding RemoveAppData}" Margin="0 10">
+                Remove my settings, profiles and plugins
+            </RadioButton>
+
+            <RadioButton Style="{StaticResource MaterialDesignRadioButton}" IsChecked="{Binding KeepAppData}">
+                Keep my settings, profiles and plugins (useful if you are only reinstalling Artemis)
+            </RadioButton>
+        </StackPanel>
+
+        <mde:StepButtonBar Grid.Row="4"
+                           Grid.ColumnSpan="2"
+                           VerticalAlignment="Bottom"
+                           Continue="CONTINUE"
+                           Cancel="CANCEL"
+                           IsContinueEnabled="{Binding CanContinue}" />
+    </Grid>
+</UserControl>

@@ -95,10 +95,24 @@
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Extensions\HttpClientExtensions.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />
+    <Compile Include="Screens\Abstract\InstallStepViewModel.cs" />
+    <Compile Include="Screens\Abstract\UninstallStepViewModel.cs" />
     <Compile Include="Screens\UnattendedViewModel.cs" />
-    <Compile Include="Screens\InstallViewModel.cs" />
-    <Compile Include="Screens\ModifyViewModel.cs" />
+    <Compile Include="Screens\Install\InstallViewModel.cs" />
+    <Compile Include="Screens\Modify\ModifyViewModel.cs" />
     <Compile Include="Screens\AttendedViewModel.cs" />
+    <Compile Include="Screens\Uninstall\Steps\OptionsStepView.xaml.cs">
+      <DependentUpon>OptionsStepView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\Uninstall\Steps\OptionsStepViewModel.cs" />
+    <Compile Include="Screens\Uninstall\Steps\UninstallationView.xaml.cs">
+      <DependentUpon>UninstallationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\Uninstall\Steps\UninstallationViewModel.cs" />
+    <Compile Include="Screens\Uninstall\UninstallView.xaml.cs">
+      <DependentUpon>UninstallView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\Uninstall\UninstallViewModel.cs" />
     <Compile Include="Services\Prerequisites\RedistPrerequisite.cs" />
     <Compile Include="Services\Prerequisites\DotnetPrerequisite.cs" />
     <Compile Include="Services\Prerequisites\Interface\IPrerequisite.cs" />
@@ -107,38 +121,36 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Screens\Steps\ConfigurationStep.cs" />
-    <Compile Include="Screens\Steps\DirectoryStepView.xaml.cs">
+    <Compile Include="Screens\Abstract\OrderedScreen.cs" />
+    <Compile Include="Screens\Install\Steps\DirectoryStepView.xaml.cs">
       <DependentUpon>DirectoryStepView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Screens\Steps\DirectoryStepViewModel.cs" />
-    <Compile Include="Screens\Steps\InstallStepView.xaml.cs">
-      <DependentUpon>InstallStepView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Screens\Steps\InstallStepViewModel.cs" />
-    <Compile Include="Screens\Steps\PrerequisitesStepView.xaml.cs">
+    <Compile Include="Screens\Install\Steps\DirectoryStepViewModel.cs" />
+    <Compile Include="Screens\Install\Steps\InstallationStepViewModel.cs" />
+    <Compile Include="Screens\Install\Steps\PrerequisitesStepView.xaml.cs">
       <DependentUpon>PrerequisitesStepView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Screens\Steps\PrerequisitesStepViewModel.cs" />
-    <Compile Include="Screens\Steps\Prerequisites\PrerequisiteView.xaml.cs">
+    <Compile Include="Screens\Install\Steps\PrerequisitesStepViewModel.cs" />
+    <Compile Include="Screens\Install\Prerequisites\PrerequisiteView.xaml.cs">
       <DependentUpon>PrerequisiteView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Screens\Steps\Prerequisites\PrerequisiteViewModel.cs" />
-    <Compile Include="Screens\Steps\WelcomeStepViewModel.cs" />
+    <Compile Include="Screens\Install\Prerequisites\PrerequisiteViewModel.cs" />
+    <Compile Include="Screens\Install\Steps\WelcomeStepViewModel.cs" />
     <Compile Include="Services\IIInstallationService.cs" />
     <Compile Include="Services\InstallationService.cs" />
     <Compile Include="Stylet\FluentValidationAdapter.cs" />
     <Compile Include="Utilities\IDownloadable.cs" />
     <Compile Include="Utilities\ProcessUtilities.cs" />
+    <Compile Include="Utilities\ShortcutUtilities.cs" />
     <Page Include="Screens\AttendedView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Screens\InstallView.xaml">
+    <Page Include="Screens\Install\InstallView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Screens\ModifyView.xaml">
+    <Page Include="Screens\Modify\ModifyView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -146,27 +158,39 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Screens\Steps\DirectoryStepView.xaml">
+    <Page Include="Screens\Install\Steps\DirectoryStepView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Screens\Steps\InstallStepView.xaml">
+    <Page Include="Screens\Install\Steps\InstallationStepView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Screens\Steps\PrerequisitesStepView.xaml">
+    <Page Include="Screens\Install\Steps\PrerequisitesStepView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Screens\Steps\Prerequisites\PrerequisiteView.xaml">
+    <Page Include="Screens\Install\Prerequisites\PrerequisiteView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Screens\Steps\WelcomeStepView.xaml">
+    <Page Include="Screens\Install\Steps\WelcomeStepView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Screens\UnattendedView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Screens\Uninstall\Steps\OptionsStepView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Screens\Uninstall\Steps\UninstallationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Screens\Uninstall\UninstallView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

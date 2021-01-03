@@ -1,12 +1,13 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Artemis.Installer.Screens.Steps.Prerequisites;
+using Artemis.Installer.Screens.Abstract;
+using Artemis.Installer.Screens.Install.Prerequisites;
 using Artemis.Installer.Services;
 using Stylet;
 
-namespace Artemis.Installer.Screens.Steps
+namespace Artemis.Installer.Screens.Install.Steps
 {
-    public class PrerequisitesStepViewModel : ConfigurationStep
+    public class PrerequisitesStepViewModel : InstallStepViewModel
     {
         private bool _canContinue;
 

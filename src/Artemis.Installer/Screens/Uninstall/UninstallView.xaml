@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="Artemis.Installer.Screens.Uninstall.UninstallView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mde="https://spiegelp.github.io/MaterialDesignExtensions/winfx/xaml"
+             xmlns:s="https://github.com/canton7/Stylet"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <mde:Stepper IsLinear="True" Layout="Horizontal" ActiveStepChanged="{s:Action ActiveStepChanged}" CancelNavigation="{s:Action Cancel}" Margin="15">
+        <mde:Step>
+            <mde:Step.Header>
+                <mde:StepTitleHeader FirstLevelTitle="Options" />
+            </mde:Step.Header>
+            <mde:Step.Content>
+                <ContentControl s:View.Model="{Binding ActiveItem}" />
+            </mde:Step.Content>
+        </mde:Step>
+        <mde:Step>
+            <mde:Step.Header>
+                <mde:StepTitleHeader FirstLevelTitle="Uninstall" />
+            </mde:Step.Header>
+            <mde:Step.Content>
+                <ContentControl s:View.Model="{Binding ActiveItem}" />
+            </mde:Step.Content>
+        </mde:Step>
+        <mde:Step>
+            <mde:Step.Header>
+                <mde:StepTitleHeader FirstLevelTitle="Finish" />
+            </mde:Step.Header>
+            <mde:Step.Content>
+                <ContentControl s:View.Model="{Binding ActiveItem}" />
+            </mde:Step.Content>
+        </mde:Step>
+    </mde:Stepper>
+</UserControl>

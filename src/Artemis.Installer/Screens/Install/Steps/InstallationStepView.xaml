@@ -1,14 +1,14 @@
-﻿<UserControl x:Class="Artemis.Installer.Screens.Steps.InstallStepView"
+﻿<UserControl x:Class="Artemis.Installer.Screens.Install.Steps.InstallationStepView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:steps="clr-namespace:Artemis.Installer.Screens.Steps"
              xmlns:s="https://github.com/canton7/Stylet"
              xmlns:mde="https://spiegelp.github.io/MaterialDesignExtensions/winfx/xaml"
+             xmlns:steps="clr-namespace:Artemis.Installer.Screens.Install.Steps"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance steps:InstallStepViewModel}">
+             d:DataContext="{d:DesignInstance steps:InstallationStepViewModel}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="40" />
@@ -35,7 +35,7 @@
 
         <Grid Grid.Row="2" Margin="0 25">
             <StackPanel>
-                <ProgressBar Value="{Binding ProcessPercentage}"/>
+                <ProgressBar Value="{Binding ProcessPercentage}" />
                 <TextBlock Margin="0 10" Visibility="{Binding IsDownloading, Converter={x:Static s:BoolToVisibilityConverter.Instance}}">
                     Downloading <Run Text="{Binding DownloadCurrent, StringFormat=N2}" />/
                     <Run Text="{Binding DownloadTotal, StringFormat=N2}" /> MB.

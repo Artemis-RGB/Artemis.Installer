@@ -1,26 +1,28 @@
 ﻿using System.IO;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
+using Artemis.Installer.Screens.Abstract;
 using Artemis.Installer.Services;
 using Artemis.Installer.Utilities;
 using MaterialDesignExtensions.Controls;
 using Stylet;
 
-namespace Artemis.Installer.Screens.Steps
+namespace Artemis.Installer.Screens.Install.Steps
 {
-    public class InstallStepViewModel : ConfigurationStep, IDownloadable
+    public class InstallationStepViewModel : InstallStepViewModel, IDownloadable
     {
         private readonly IInstallationService _installationService;
         private bool _canContinue;
         private string _dadJoke = "Loading your dad joke...";
         private double _downloadCurrent;
         private double _downloadTotal;
+        private bool _isDownloading;
         private float _processPercentage;
         private string _status;
-        private bool _isDownloading;
 
-        public InstallStepViewModel(IInstallationService installationService)
+        public InstallationStepViewModel(IInstallationService installationService)
         {
             _installationService = installationService;
         }
@@ -69,6 +71,18 @@ namespace Artemis.Installer.Screens.Steps
             set => SetAndNotify(ref _processPercentage, value);
         }
 
+        #region Implementation of IDownloadable
+
+        /// <inheritdoc />
+        public void ReportProgress(long currentBytes, long totalBytes, float percentage)
+        {
+            DownloadCurrent = currentBytes / 1024.0 / 1024.0;
+            DownloadTotal = totalBytes / 1024.0 / 1024.0;
+            ProcessPercentage = percentage;
+        }
+
+        #endregion
+
         #region Overrides of Screen
 
         /// <inheritdoc />
@@ -106,15 +120,15 @@ namespace Artemis.Installer.Screens.Steps
             // Extract the ZIP
             Status = "Extracting Artemis files.";
             await _installationService.InstallBinaries(file, this);
-            
+
             // Create registry keys
             Status = "Finalizing installation.";
             _installationService.CreateInstallKey(version);
             // Copy ourselves to the install dir
-            File.Copy(System.Reflection.Assembly.GetCallingAssembly().Location, Path.Combine(_installationService.InstallationDirectory, "Artemis.Installer.exe"), true);
+            File.Copy(Assembly.GetCallingAssembly().Location, Path.Combine(_installationService.InstallationDirectory, "Artemis.Installer.exe"), true);
             // Remove the install archive
             File.Delete(file);
-            
+
             Status = "Installation finished.";
             CanContinue = true;
         }
@@ -129,18 +143,6 @@ namespace Artemis.Installer.Screens.Steps
                 if (result.IsSuccessStatusCode)
                     DadJoke = (await result.Content.ReadAsStringAsync())?.Trim();
             }
-        }
-
-        #endregion
-
-        #region Implementation of IDownloadable
-
-        /// <inheritdoc />
-        public void ReportProgress(long currentBytes, long totalBytes, float percentage)
-        {
-            DownloadCurrent = (currentBytes / 1024.0) / 1024.0;
-            DownloadTotal = (totalBytes / 1024.0) / 1024.0;
-            ProcessPercentage = percentage;
         }
 
         #endregion

@@ -4,18 +4,18 @@ using Artemis.Installer.Services;
 using Artemis.Installer.Services.Prerequisites;
 using Stylet;
 
-namespace Artemis.Installer.Screens.Steps.Prerequisites
+namespace Artemis.Installer.Screens.Install.Prerequisites
 {
     public class PrerequisiteViewModel : Screen
     {
         private readonly IInstallationService _installationService;
         private string _description;
+        private double _downloadCurrent;
+        private double _downloadPercentage;
+        private double _downloadTotal;
+        private bool _isInstalling;
         private bool _isMet;
         private string _title;
-        private double _downloadCurrent;
-        private double _downloadTotal;
-        private double _downloadPercentage;
-        private bool _isInstalling;
 
         public PrerequisiteViewModel(IInstallationService installationService, IPrerequisite prerequisite)
         {
@@ -74,10 +74,22 @@ namespace Artemis.Installer.Screens.Steps.Prerequisites
             IsMet = Prerequisite.IsMet();
         }
 
+        public async Task<string> Download()
+        {
+            return await _installationService.DownloadPrerequisite(Prerequisite);
+        }
+
+        public async Task Install(string file)
+        {
+            IsInstalling = true;
+            await _installationService.InstallPrerequisite(Prerequisite, file);
+            IsInstalling = false;
+        }
+
         private void PrerequisiteOnDownloadProgressUpdated(object sender, EventArgs e)
         {
-            DownloadCurrent = (Prerequisite.DownloadCurrentBytes / 1024.0) / 1024.0;
-            DownloadTotal = (Prerequisite.DownloadTotalBytes / 1024.0) / 1024.0;
+            DownloadCurrent = Prerequisite.DownloadCurrentBytes / 1024.0 / 1024.0;
+            DownloadTotal = Prerequisite.DownloadTotalBytes / 1024.0 / 1024.0;
             DownloadPercentage = Prerequisite.DownloadPercentage;
         }
 
@@ -98,17 +110,5 @@ namespace Artemis.Installer.Screens.Steps.Prerequisites
         }
 
         #endregion
-
-        public async Task<string> Download()
-        {
-            return await _installationService.DownloadPrerequisite(Prerequisite);
-        }
-
-        public async Task Install(string file)
-        {
-            IsInstalling = true;
-            await _installationService.InstallPrerequisite(Prerequisite, file);
-            IsInstalling = false;
-        }
     }
 }

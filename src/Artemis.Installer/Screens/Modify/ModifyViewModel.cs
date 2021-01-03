@@ -1,6 +1,6 @@
 ﻿using Stylet;
 
-namespace Artemis.Installer.Screens
+namespace Artemis.Installer.Screens.Modify
 {
     public class ModifyViewModel : Screen
     {

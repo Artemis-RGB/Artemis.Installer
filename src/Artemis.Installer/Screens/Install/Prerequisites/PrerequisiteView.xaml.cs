@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace Artemis.Installer.Screens.Steps.Prerequisites
+namespace Artemis.Installer.Screens.Install.Prerequisites
 {
     /// <summary>
     ///     Interaction logic for PrerequisiteView.xaml

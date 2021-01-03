@@ -18,7 +18,7 @@
                     Height="550" Width="800"
                     ResizeMode="NoResize"
                     d:DataContext="{d:DesignInstance local:RootViewModel}">
-    <materialDesign:DialogHost IsTabStop="False" Focusable="False" Identifier="RootDialogHost" DialogTheme="Inherit" >
+    <materialDesign:DialogHost IsTabStop="False" Focusable="False" Identifier="RootDialogHost" DialogTheme="Inherit">
         <ContentControl s:View.Model="{Binding ActiveItem}" />
     </materialDesign:DialogHost>
 </mde:MaterialWindow>

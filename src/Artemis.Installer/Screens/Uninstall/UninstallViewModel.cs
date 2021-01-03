@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Artemis.Installer.Screens.Steps;
+using Artemis.Installer.Screens.Abstract;
 using MaterialDesignExtensions.Controllers;
 using MaterialDesignExtensions.Controls;
 using Stylet;
 
-namespace Artemis.Installer.Screens
+namespace Artemis.Installer.Screens.Uninstall
 {
-    public class InstallViewModel : Conductor<ConfigurationStep>.Collection.OneActive
+    public class UninstallViewModel : Conductor<UninstallStepViewModel>.Collection.OneActive
     {
         private StepperController _stepperController;
 
-        public InstallViewModel(IEnumerable<ConfigurationStep> configurationSteps)
+        public UninstallViewModel(IEnumerable<UninstallStepViewModel> configurationSteps)
         {
             Items.AddRange(configurationSteps.OrderBy(s => s.Order));
         }

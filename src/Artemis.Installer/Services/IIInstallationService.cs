@@ -12,12 +12,18 @@ namespace Artemis.Installer.Services
         List<IPrerequisite> Prerequisites { get; }
         List<string> Args { get; set; }
         bool IsUnattended { get; }
+        bool RemoveAppData { get; set; }
+
         Task<string> DownloadPrerequisite(IPrerequisite prerequisite);
         Task InstallPrerequisite(IPrerequisite prerequisite, string file);
+
         Task<string> GetBinariesVersion(string branch = "master");
         Task<string> DownloadBinaries(string version, IDownloadable downloadable, string branch = "master");
         Task InstallBinaries(string file, IDownloadable downloadable);
+        Task UninstallBinaries(IDownloadable downloadable);
+
         RegistryKey GetInstallKey();
         void CreateInstallKey(string version, string branch = "master");
+        void RemoveInstallKey();
     }
 }

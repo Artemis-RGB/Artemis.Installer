@@ -20,14 +20,21 @@ namespace Artemis.Installer.Services
 {
     public class InstallationService : IInstallationService
     {
+        private string _artemisStartMenuDirectory;
+
         public InstallationService(IEnumerable<IPrerequisite> prerequisites)
         {
             RegistryKey installKey = GetInstallKey();
-            InstallationDirectory = installKey != null 
-                ? installKey.GetValue("InstallLocation").ToString() 
+            InstallationDirectory = installKey != null
+                ? installKey.GetValue("InstallLocation").ToString()
                 : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Artemis");
 
             Prerequisites = prerequisites.ToList();
+
+            _artemisStartMenuDirectory = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                @"Microsoft\Windows\Start Menu\Programs\Artemis"
+            );
         }
 
         public async Task<string> DownloadPrerequisite(IPrerequisite prerequisite)
@@ -135,6 +142,53 @@ namespace Artemis.Installer.Services
             }
 
             downloadable.ReportProgress(0, 0, 100);
+
+            // Populate the start menu
+            if (!Directory.Exists(_artemisStartMenuDirectory))
+                Directory.CreateDirectory(_artemisStartMenuDirectory);
+
+            ShortcutUtilities.Create(
+                Path.Combine(_artemisStartMenuDirectory, "Artemis.lnk"),
+                Path.Combine(InstallationDirectory, "Artemis.UI.exe"),
+                "",
+                InstallationDirectory,
+                "Artemis",
+                "",
+                ""
+            );
+            ShortcutUtilities.Create(
+                Path.Combine(_artemisStartMenuDirectory, "Uninstall Artemis.lnk"),
+                Path.Combine(InstallationDirectory, "Artemis.Installer.exe"),
+                "-uninstall",
+                InstallationDirectory,
+                "Uninstall Artemis",
+                "",
+                ""
+            );
+        }
+
+        public async Task UninstallBinaries(IDownloadable downloadable)
+        {
+            // Get all the files recursively as our total
+            string[] files = Directory.GetFiles(InstallationDirectory, "*", SearchOption.AllDirectories);
+
+            // Delete all files
+
+            // Delete the folder itself
+
+            // If needed, repeat for app data
+            if (RemoveAppData)
+                await DeleteAppData(downloadable);
+        }
+
+        private async Task DeleteAppData(IDownloadable downloadable)
+        {
+            // Get all the files recursively as our total
+            string[] files = Directory.GetFiles(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Artemis"), "*", SearchOption.AllDirectories);
+
+            // Delete all files
+
+            // Delete the folder itself
         }
 
         public RegistryKey GetInstallKey()
@@ -156,13 +210,21 @@ namespace Artemis.Installer.Services
             key.SetValue("UninstallString", $"\"{Path.Combine(InstallationDirectory, "Artemis.Installer.exe")}\" -uninstall", RegistryValueKind.String);
             key.SetValue("URLInfoAbout", "https://artemis-rgb.com", RegistryValueKind.String);
             key.SetValue("Branch", branch, RegistryValueKind.String);
-            
+
             key.Close();
         }
 
-        public string InstallationDirectory { get; set; }
-        public List<IPrerequisite> Prerequisites { get; }
+        /// <inheritdoc />
+        public void RemoveInstallKey()
+        {
+            throw new NotImplementedException();
+        }
+
         public List<string> Args { get; set; }
+        public List<IPrerequisite> Prerequisites { get; }
+        public string InstallationDirectory { get; set; }
+        public bool RemoveAppData { get; set; }
+
         public bool IsUnattended => Args != null && Args.Contains("-unattended");
     }
 }
