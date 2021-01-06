@@ -4,63 +4,90 @@
     ".NETFramework,Version=v4.7.2": {
       "AngleSharp": {
         "type": "Direct",
-        "requested": "[0.14.0, 0.14.0]",
+        "requested": "[0.14.0, )",
         "resolved": "0.14.0",
-        "contentHash": "34w9I7nyszfEYBY8g7T3B0AtWlOivNh+QoWc3KECRwbmcNyqWmb4huihtmpH2Ds7rIRRHMMPv9yfPBxxjBn03g=="
+        "contentHash": "34w9I7nyszfEYBY8g7T3B0AtWlOivNh+QoWc3KECRwbmcNyqWmb4huihtmpH2Ds7rIRRHMMPv9yfPBxxjBn03g==",
+        "dependencies": {
+          "System.Text.Encoding.CodePages": "4.5.0"
+        }
       },
       "FluentValidation": {
         "type": "Direct",
-        "requested": "[9.3.0, 9.3.0]",
+        "requested": "[9.3.0, )",
         "resolved": "9.3.0",
         "contentHash": "C44l6Ih+YwpED/TsXfl6LIq6Z4wLXahstnr6T70uUg1Hs7/bLBKKAo9Nl0sLhVjDE8TA+fF+O3IM4nDrwabcSQ=="
       },
       "MaterialDesignColors": {
         "type": "Direct",
-        "requested": "[1.2.7, 1.2.7]",
+        "requested": "[1.2.7, )",
         "resolved": "1.2.7",
         "contentHash": "e+shDlaSAJcuTArqtfWjVUgAOlwQlgWq8akkzCGe1MvfV1ozmOqqXyWxg5w0vC/3/KZ84wnPUJeI1wzEpI0uJQ=="
       },
       "MaterialDesignExtensions": {
         "type": "Direct",
-        "requested": "[3.3.0-a01, 3.3.0-a01]",
+        "requested": "[3.3.0-a01, )",
         "resolved": "3.3.0-a01",
-        "contentHash": "dq8lvcj73H6TCmhjlRud8EeUSgC8S2U7T4jOoefmLieZQigbfQNy29hF1041cnu6b3l8mW00zWJituRMSt0iOQ=="
+        "contentHash": "dq8lvcj73H6TCmhjlRud8EeUSgC8S2U7T4jOoefmLieZQigbfQNy29hF1041cnu6b3l8mW00zWJituRMSt0iOQ==",
+        "dependencies": {
+          "MaterialDesignColors": "1.2.7",
+          "MaterialDesignThemes": "3.2.0"
+        }
       },
       "MaterialDesignThemes": {
         "type": "Direct",
-        "requested": "[3.2.0, 3.2.0]",
+        "requested": "[3.2.0, )",
         "resolved": "3.2.0",
-        "contentHash": "aOZQShQuV7sCWOwO98dYz1S4stmIWDBH+Q6KoR3wDiDyuG7twoGnBDzQBhrxuS16I3GQiG5nfvUjEJFVc/zdKg=="
+        "contentHash": "aOZQShQuV7sCWOwO98dYz1S4stmIWDBH+Q6KoR3wDiDyuG7twoGnBDzQBhrxuS16I3GQiG5nfvUjEJFVc/zdKg==",
+        "dependencies": {
+          "MaterialDesignColors": "[1.2.7, 2.0.0)"
+        }
       },
       "Ookii.Dialogs.Wpf": {
         "type": "Direct",
-        "requested": "[3.1.0, 3.1.0]",
+        "requested": "[3.1.0, )",
         "resolved": "3.1.0",
         "contentHash": "EpUWoSLLO1aVkUmo2dPE4xO+zQZRxbp13agbbQzGBL1ACALgCD69cTwdLdPdg2LIsPcZ4uA3iID+YaazdZxyww=="
       },
       "Stylet": {
         "type": "Direct",
-        "requested": "[1.3.5, 1.3.5]",
+        "requested": "[1.3.5, )",
         "resolved": "1.3.5",
         "contentHash": "9vjjaTgf5sZAGHnxQWIslD32MG5gXj7ANgS+w965L5Eh//UC3qwZDrEf226Pf+v1P/ldAJDpUySnOyGlb3TSSw=="
       },
       "Stylet.Start": {
         "type": "Direct",
-        "requested": "[1.3.5, 1.3.5]",
+        "requested": "[1.3.5, )",
         "resolved": "1.3.5",
-        "contentHash": "UwVT5eTTNWI8a3hiva361UMD/ebmY4pd7c4qtkM9soAGcBavNCrgcxO3IC3+L+1hEcuZqyOqdBLyrT1lOB/M+w=="
+        "contentHash": "UwVT5eTTNWI8a3hiva361UMD/ebmY4pd7c4qtkM9soAGcBavNCrgcxO3IC3+L+1hEcuZqyOqdBLyrT1lOB/M+w==",
+        "dependencies": {
+          "Stylet": "[1.3.5]"
+        }
       },
       "System.Runtime.CompilerServices.Unsafe": {
         "type": "Direct",
-        "requested": "[4.5.0, 4.5.0]",
+        "requested": "[4.5.0, )",
         "resolved": "4.5.0",
         "contentHash": "YrzNWduCDHhUaSRBxHxL11UkM2fD6y8hITHis4/LbQZ6vj3vdRjoH3IoPWWC9uDXK2wHIqn+b5gv1Np/VKyM1g=="
       },
       "System.Text.Encoding.CodePages": {
         "type": "Direct",
-        "requested": "[4.5.0, 4.5.0]",
+        "requested": "[4.5.0, )",
         "resolved": "4.5.0",
-        "contentHash": "S0wEUiKcLvRlkFUXca8uio1UQ5bYQzYgOmOKtCqaBQC3GR9AJjh43otcM32IGsAyvadFTaAMw9Irm6dS4Evfng=="
+        "contentHash": "S0wEUiKcLvRlkFUXca8uio1UQ5bYQzYgOmOKtCqaBQC3GR9AJjh43otcM32IGsAyvadFTaAMw9Irm6dS4Evfng==",
+        "dependencies": {
+          "System.Runtime.CompilerServices.Unsafe": "4.5.0"
+        }
+      }
+    },
+    ".NETFramework,Version=v4.7.2/win7-x86": {
+      "System.Text.Encoding.CodePages": {
+        "type": "Direct",
+        "requested": "[4.5.0, )",
+        "resolved": "4.5.0",
+        "contentHash": "S0wEUiKcLvRlkFUXca8uio1UQ5bYQzYgOmOKtCqaBQC3GR9AJjh43otcM32IGsAyvadFTaAMw9Irm6dS4Evfng==",
+        "dependencies": {
+          "System.Runtime.CompilerServices.Unsafe": "4.5.0"
+        }
       }
     }
   }
