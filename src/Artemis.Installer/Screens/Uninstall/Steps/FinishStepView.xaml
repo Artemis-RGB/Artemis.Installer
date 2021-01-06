@@ -1,0 +1,57 @@
+﻿<UserControl x:Class="Artemis.Installer.Screens.Uninstall.Steps.FinishStepView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Artemis.Installer.Screens.Install.Steps"
+             xmlns:s="https://github.com/canton7/Stylet"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance local:FinishStepViewModel}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel>
+            <TextBlock Style="{StaticResource MaterialDesignHeadline4TextBlock}">Uninstall finished ಥ_ಥ</TextBlock>
+
+            <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" TextWrapping="Wrap">
+                If you need any help, you can always check these resources out below:
+            </TextBlock>
+
+            <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" TextWrapping="Wrap" Margin="5 5 0 0">
+                - The
+                <Hyperlink NavigateUri="https://wiki.artemis-rgb.com/" RequestNavigate="{s:Action OpenHyperlink}" Style="{StaticResource ArtemisHyperlink}">
+                    Artemis wiki
+                </Hyperlink>
+                and more specifically the
+                <Hyperlink NavigateUri="https://wiki.artemis-rgb.com/en/guides/user/introduction" RequestNavigate="{s:Action OpenHyperlink}" Style="{StaticResource ArtemisHyperlink}">
+                    getting started
+                </Hyperlink>
+                guide
+            </TextBlock>
+            <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" TextWrapping="Wrap" Margin="5 0 0 0">
+                - The Artemis
+                <Hyperlink NavigateUri="https://github.com/Artemis-RGB/Artemis" RequestNavigate="{s:Action OpenHyperlink}" Style="{StaticResource ArtemisHyperlink}">
+                    GitHub repository
+                </Hyperlink>
+            </TextBlock>
+            <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" TextWrapping="Wrap" Margin="5 0 0 0">
+                - Our
+                <Hyperlink NavigateUri="https://discord.gg/S3MVaC9" RequestNavigate="{s:Action OpenHyperlink}" Style="{StaticResource ArtemisHyperlink}">
+                    Discord server
+                </Hyperlink>
+            </TextBlock>
+
+        </StackPanel>
+        <Button Grid.Row="1"
+                Style="{StaticResource MaterialDesignFlatButton}"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Right"
+                Margin="0 8"
+                Command="{s:Action Finish}">
+            FINISH
+        </Button>
+    </Grid>
+</UserControl>

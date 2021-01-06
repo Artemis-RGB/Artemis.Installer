@@ -1,4 +1,7 @@
-﻿using Artemis.Installer.Services;
+﻿using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using Artemis.Installer.Services;
 using Stylet;
 
 namespace Artemis.Installer.Screens
@@ -34,6 +37,18 @@ namespace Artemis.Installer.Screens
 
         private void ActiveItemOnClosed(object sender, CloseEventArgs e)
         {
+            ActiveItem.Closed -= ActiveItemOnClosed;
+            if (_installationService.RemoveInstallationDirectoryOnShutdown)
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    Arguments = $"/C PING -n 2 127.0.0.1>nul & RMDIR /Q /S \"{_installationService.InstallationDirectory}\"",
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    CreateNoWindow = true,
+                    FileName = "cmd.exe"
+                });
+            }
+
             RequestClose();
         }
     }

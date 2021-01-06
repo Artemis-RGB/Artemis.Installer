@@ -27,6 +27,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.14.0" />
+    <PackageReference Include="Costura.Fody" Version="4.1.0" />
     <PackageReference Include="FluentValidation" Version="9.3.0" />
     <PackageReference Include="MaterialDesignColors" Version="1.2.7" />
     <PackageReference Include="MaterialDesignExtensions" Version="3.3.0-a01" />
@@ -53,4 +54,18 @@
     <None Include="app.manifest" />
     <None Include="packages.lock.json" />
   </ItemGroup>
+  <ItemGroup>
+    <FluentValidationExcludedCultures Include="ar-DZ;cs;cs-CZ;de;fr;fr-FR;pt;pt-BR;Ru;ru-ru;uz-Latn-UZ">
+      <InProject>false</InProject>
+    </FluentValidationExcludedCultures>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Screens\Uninstall\Steps\FinishStepView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <Target Name="RemoveTranslationsAfterBuild" AfterTargets="AfterBuild">
+    <RemoveDir Directories="@(FluentValidationExcludedCultures->'$(OutputPath)%(Filename)')" />
+  </Target>
 </Project>

@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -86,11 +88,11 @@ namespace Artemis.Installer.Screens.Install.Steps
         #region Overrides of Screen
 
         /// <inheritdoc />
-        protected override void OnActivate()
+        protected override void OnInitialActivate()
         {
             Execute.PostToUIThread(async () => await GetRandomFact());
             Execute.PostToUIThread(async () => await Install());
-            base.OnActivate();
+            base.OnInitialActivate();
         }
 
         private async Task Install()
@@ -117,6 +119,11 @@ namespace Artemis.Installer.Screens.Install.Steps
             string file = await _installationService.DownloadBinaries(version, this);
             IsDownloading = false;
 
+            Status = "Closing down Artemis.";
+            Process process = Process.GetProcessesByName("Artemis.UI").FirstOrDefault();
+            // TODO: Do this gracefully, process.CloseMainWindow() won't do the trick because the tray has no handle
+            process?.Kill();
+            
             // Extract the ZIP
             Status = "Extracting Artemis files.";
             await _installationService.InstallBinaries(file, this);
@@ -124,8 +131,7 @@ namespace Artemis.Installer.Screens.Install.Steps
             // Create registry keys
             Status = "Finalizing installation.";
             _installationService.CreateInstallKey(version);
-            // Copy ourselves to the install dir
-            File.Copy(Assembly.GetCallingAssembly().Location, Path.Combine(_installationService.InstallationDirectory, "Artemis.Installer.exe"), true);
+         
             // Remove the install archive
             File.Delete(file);
 

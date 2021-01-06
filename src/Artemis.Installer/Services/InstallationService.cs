@@ -97,6 +97,7 @@ namespace Artemis.Installer.Services
 
         public async Task InstallBinaries(string file, IDownloadable downloadable)
         {
+            RemoveInstallationDirectoryOnShutdown = false;
             using (FileStream fileStream = new FileStream(file, FileMode.Open))
             {
                 ZipArchive archive = new ZipArchive(fileStream);
@@ -109,27 +110,7 @@ namespace Artemis.Installer.Services
                         if (entry.Length > 0)
                         {
                             string path = Path.Combine(InstallationDirectory, entry.FullName);
-                            if (!Directory.Exists(Path.GetDirectoryName(path)))
-                            {
-                                DirectorySecurity ds = new DirectorySecurity();
-                                ds.AddAccessRule(new FileSystemAccessRule(
-                                    new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null),
-                                    FileSystemRights.ReadAndExecute,
-                                    InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
-                                    PropagationFlags.None,
-                                    AccessControlType.Allow)
-                                );
-                                ds.AddAccessRule(new FileSystemAccessRule(
-                                    new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null),
-                                    FileSystemRights.FullControl,
-                                    InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
-                                    PropagationFlags.None,
-                                    AccessControlType.Allow)
-                                );
-
-                                Directory.CreateDirectory(Path.GetDirectoryName(path), ds);
-                            }
-
+                            CreateDirectoryForFile(path);
                             using (Stream extractStream = new FileStream(path, FileMode.OpenOrCreate))
                             {
                                 await unzippedEntryStream.CopyToAsync(extractStream);
@@ -142,6 +123,15 @@ namespace Artemis.Installer.Services
             }
 
             downloadable.ReportProgress(0, 0, 100);
+
+            // Copy installer
+            string source = System.Reflection.Assembly.GetEntryAssembly().Location;
+            string target = Path.Combine(InstallationDirectory, "Installer", "Artemis.Installer.exe");
+            if (source != target)
+            {
+                CreateDirectoryForFile(target);
+                File.Copy(source, target, true);
+            }
 
             // Populate the start menu
             if (!Directory.Exists(_artemisStartMenuDirectory))
@@ -158,7 +148,7 @@ namespace Artemis.Installer.Services
             );
             ShortcutUtilities.Create(
                 Path.Combine(_artemisStartMenuDirectory, "Uninstall Artemis.lnk"),
-                Path.Combine(InstallationDirectory, "Artemis.Installer.exe"),
+                Path.Combine(InstallationDirectory, "Installer", "Artemis.Installer.exe"),
                 "-uninstall",
                 InstallationDirectory,
                 "Uninstall Artemis",
@@ -167,28 +157,90 @@ namespace Artemis.Installer.Services
             );
         }
 
+        private void CreateDirectoryForFile(string path)
+        {
+            if (Directory.Exists(Path.GetDirectoryName(path)))
+                return;
+
+            DirectorySecurity ds = new DirectorySecurity();
+            ds.AddAccessRule(new FileSystemAccessRule(
+                new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null),
+                FileSystemRights.ReadAndExecute,
+                InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+                PropagationFlags.None,
+                AccessControlType.Allow)
+            );
+            ds.AddAccessRule(new FileSystemAccessRule(
+                new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null),
+                FileSystemRights.FullControl,
+                InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+                PropagationFlags.None,
+                AccessControlType.Allow)
+            );
+
+            Directory.CreateDirectory(Path.GetDirectoryName(path), ds);
+        }
+
         public async Task UninstallBinaries(IDownloadable downloadable)
         {
+            string source = System.Reflection.Assembly.GetEntryAssembly().Location;
+            string target = Path.Combine(InstallationDirectory, "Installer", "Artemis.Installer.exe");
+            bool runningFromInstallDir = source == target;
+
             // Get all the files recursively as our total
             string[] files = Directory.GetFiles(InstallationDirectory, "*", SearchOption.AllDirectories);
 
             // Delete all files
+            await Task.Run(() =>
+            {
+                int index = 0;
+                foreach (string file in files)
+                {
+                    if (file != source)
+                    {
+                        File.Delete(file);
+                    }
 
-            // Delete the folder itself
+                    index++;
+                    downloadable.ReportProgress(index, files.Length, index / (float) files.Length * 100);
+                }
+            });
+
+            // Delete the folder itself after the installer closes
+            RemoveInstallationDirectoryOnShutdown = true;
+            downloadable.ReportProgress(0, 0, 100);
 
             // If needed, repeat for app data
             if (RemoveAppData)
                 await DeleteAppData(downloadable);
+
+            // Clean up the start menu
+            if (Directory.Exists(_artemisStartMenuDirectory))
+                Directory.Delete(_artemisStartMenuDirectory, true);
         }
 
         private async Task DeleteAppData(IDownloadable downloadable)
         {
             // Get all the files recursively as our total
-            string[] files = Directory.GetFiles(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Artemis"), "*", SearchOption.AllDirectories);
+            string directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Artemis");
+            string[] files = Directory.GetFiles(directory, "*", SearchOption.AllDirectories);
 
             // Delete all files
+            await Task.Run(() =>
+            {
+                int index = 0;
+                foreach (string file in files)
+                {
+                    File.Delete(file);
+
+                    index++;
+                    downloadable.ReportProgress(index, files.Length, index / (float) files.Length * 100);
+                }
+            });
 
             // Delete the folder itself
+            Directory.Delete(directory, true);
+            downloadable.ReportProgress(0, 0, 100);
         }
 
         public RegistryKey GetInstallKey()
@@ -207,7 +259,8 @@ namespace Artemis.Installer.Services
             key.SetValue("HelpLink", "https://wiki.artemis-rgb.com", RegistryValueKind.String);
             key.SetValue("InstallLocation", InstallationDirectory, RegistryValueKind.String);
             key.SetValue("Publisher", "Artemis RGB", RegistryValueKind.String);
-            key.SetValue("UninstallString", $"\"{Path.Combine(InstallationDirectory, "Artemis.Installer.exe")}\" -uninstall", RegistryValueKind.String);
+            key.SetValue("UninstallString", $"\"{Path.Combine(InstallationDirectory, "Installer", "Artemis.Installer.exe")}\" -uninstall", RegistryValueKind.String);
+            key.SetValue("ModifyPath", $"\"{Path.Combine(InstallationDirectory, "Installer", "Artemis.Installer.exe")}\"", RegistryValueKind.String);
             key.SetValue("URLInfoAbout", "https://artemis-rgb.com", RegistryValueKind.String);
             key.SetValue("Branch", branch, RegistryValueKind.String);
 
@@ -217,13 +270,29 @@ namespace Artemis.Installer.Services
         /// <inheritdoc />
         public void RemoveInstallKey()
         {
-            throw new NotImplementedException();
+            Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Artemis 2", false);
+        }
+
+        /// <inheritdoc />
+        public void CreateDesktopShortcut()
+        {
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Artemis.lnk");
+            ShortcutUtilities.Create(path, Path.Combine(InstallationDirectory, "Artemis.UI.exe"), "", InstallationDirectory, "Artemis", "", "");
+        }
+
+        /// <inheritdoc />
+        public void RemoveDesktopShortcut()
+        {
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Artemis.lnk");
+            if (File.Exists(path))
+                File.Delete(path);
         }
 
         public List<string> Args { get; set; }
         public List<IPrerequisite> Prerequisites { get; }
         public string InstallationDirectory { get; set; }
         public bool RemoveAppData { get; set; }
+        public bool RemoveInstallationDirectoryOnShutdown { get; set; }
 
         public bool IsUnattended => Args != null && Args.Contains("-unattended");
     }

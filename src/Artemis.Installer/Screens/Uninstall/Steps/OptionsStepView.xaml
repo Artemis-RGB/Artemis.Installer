@@ -18,37 +18,37 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Style="{StaticResource MaterialDesignBody1TextBlock}" TextWrapping="Wrap">
-            You are about to remove Artemis from the following directory:
+            You are about to remove Artemis from the following directory
         </TextBlock>
 
         <TextBox Grid.Row="1"
-                 Margin="0 10 0 50"
+                 Margin="0 10"
                  Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
                  VerticalAlignment="Center"
                  materialDesign:HintAssist.Hint="Installation directory"
                  Text="{Binding InstallationDirectory, Mode=OneWay}"
                  IsEnabled="False" />
 
-        <TextBlock Grid.Row="2" Style="{StaticResource MaterialDesignBody1TextBlock}" TextWrapping="Wrap">
-            Do you also want to remove your settings, profiles and plugins? 
-        </TextBlock>
-
-        <StackPanel Grid.Row="3">
-            <RadioButton Style="{StaticResource MaterialDesignRadioButton}" IsChecked="{Binding RemoveAppData}" Margin="0 10">
-                Remove my settings, profiles and plugins
-            </RadioButton>
-
+        <StackPanel Grid.Row="2">
             <RadioButton Style="{StaticResource MaterialDesignRadioButton}" IsChecked="{Binding KeepAppData}">
                 Keep my settings, profiles and plugins (useful if you are only reinstalling Artemis)
+                <RadioButton.RenderTransform>
+                    <ScaleTransform ScaleX="1.1" ScaleY="1.1" /> <!-- lol -->
+                </RadioButton.RenderTransform>
+            </RadioButton>
+            <RadioButton Style="{StaticResource MaterialDesignRadioButton}" IsChecked="{Binding RemoveAppData}" Margin="0 10">
+                Remove my settings, profiles and plugins
+                <RadioButton.RenderTransform>
+                    <ScaleTransform ScaleX="1.1" ScaleY="1.1" /> <!-- lolol -->
+                </RadioButton.RenderTransform>
             </RadioButton>
         </StackPanel>
 
-        <mde:StepButtonBar Grid.Row="4"
+        <mde:StepButtonBar Grid.Row="3"
                            Grid.ColumnSpan="2"
                            VerticalAlignment="Bottom"
                            Continue="CONTINUE"

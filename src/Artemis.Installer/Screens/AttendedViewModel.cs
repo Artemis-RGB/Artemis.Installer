@@ -19,6 +19,9 @@ namespace Artemis.Installer.Screens
             _installViewModel = installViewModel;
             _modifyViewModel = modifyViewModel;
             _uninstallViewModel = uninstallViewModel;
+            
+            _installViewModel.Closed += ChildOnClosed;
+            _uninstallViewModel.Closed += ChildOnClosed;
         }
 
         public void ModifyChoiceSelected()
@@ -29,8 +32,6 @@ namespace Artemis.Installer.Screens
                 ActiveItem = _uninstallViewModel;
             else
                 RequestClose();
-
-            ActiveItem.Closed += ActiveItemOnClosed;
         }
 
         protected override void OnInitialActivate()
@@ -42,11 +43,13 @@ namespace Artemis.Installer.Screens
 
             base.OnInitialActivate();
         }
-
-        private void ActiveItemOnClosed(object sender, CloseEventArgs e)
+        
+        private void ChildOnClosed(object sender, CloseEventArgs e)
         {
-            ActiveItem.Closed -= ActiveItemOnClosed;
+            _installViewModel.Closed -= ChildOnClosed;
+            _uninstallViewModel.Closed -= ChildOnClosed;
             RequestClose();
         }
+
     }
 }

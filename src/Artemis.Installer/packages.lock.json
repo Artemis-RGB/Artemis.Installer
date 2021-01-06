@@ -11,6 +11,15 @@
           "System.Text.Encoding.CodePages": "4.5.0"
         }
       },
+      "Costura.Fody": {
+        "type": "Direct",
+        "requested": "[4.1.0, )",
+        "resolved": "4.1.0",
+        "contentHash": "MkW5aqhqNvuP6MiaaD5Yx8efXv+5ucsumRx+Nsn5b+PA4RnaxJLtXhGkm1N+Hi7sjkSlL8kl1klSS/7v2DxZHw==",
+        "dependencies": {
+          "Fody": "6.0.0"
+        }
+      },
       "FluentValidation": {
         "type": "Direct",
         "requested": "[9.3.0, )",
@@ -77,6 +86,11 @@
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "4.5.0"
         }
+      },
+      "Fody": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "rH9Q7GapghyLYESfeCUOqh0S70eLc3FAikIgEEyGeng3JJf1M7mt2BUxjz93o3ipDXLrKn1s69AIEolmnVn8xg=="
       }
     },
     ".NETFramework,Version=v4.7.2/win7-x86": {

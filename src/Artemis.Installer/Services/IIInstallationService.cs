@@ -13,6 +13,7 @@ namespace Artemis.Installer.Services
         List<string> Args { get; set; }
         bool IsUnattended { get; }
         bool RemoveAppData { get; set; }
+        bool RemoveInstallationDirectoryOnShutdown { get; set; }
 
         Task<string> DownloadPrerequisite(IPrerequisite prerequisite);
         Task InstallPrerequisite(IPrerequisite prerequisite, string file);
@@ -25,5 +26,7 @@ namespace Artemis.Installer.Services
         RegistryKey GetInstallKey();
         void CreateInstallKey(string version, string branch = "master");
         void RemoveInstallKey();
+        void CreateDesktopShortcut();
+        void RemoveDesktopShortcut();
     }
 }

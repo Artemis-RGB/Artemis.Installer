@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using Artemis.Installer.Screens.Abstract;
 using Artemis.Installer.Services;
 using Artemis.Installer.Utilities;
@@ -42,17 +44,30 @@ namespace Artemis.Installer.Screens.Uninstall.Steps
         #region Overrides of Screen
 
         /// <inheritdoc />
-        protected override void OnActivate()
+        protected override void OnInitialActivate()
         {
             Execute.PostToUIThread(async () => await Uninstall());
-            base.OnActivate();
+            base.OnInitialActivate();
         }
 
         #endregion
 
         public async Task Uninstall()
         {
+            Status = "Closing down Artemis.";
+            Process process = Process.GetProcessesByName("Artemis.UI").FirstOrDefault();
+            // TODO: Do this gracefully, process.CloseMainWindow() won't do the trick because the tray has no handle
+            process?.Kill();
+            
+            Status = "Removing application files.";
             await _installationService.UninstallBinaries(this);
+            Status = "Cleaning up registry.";
+            _installationService.RemoveInstallKey();
+            Status = "Removing shortcuts.";
+            _installationService.RemoveDesktopShortcut();
+            Status = "Uninstall finished.";
+
+            CanContinue = true;
         }
 
         public void ReportProgress(long currentBytes, long totalBytes, float percentage)
