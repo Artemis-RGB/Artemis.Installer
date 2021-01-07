@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "Artemis.Installer": {
+      "commandName": "Project"
+    }
+  }
+}

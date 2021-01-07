@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using Artemis.Installer.Screens.Abstract;
@@ -123,7 +122,7 @@ namespace Artemis.Installer.Screens.Install.Steps
             Process process = Process.GetProcessesByName("Artemis.UI").FirstOrDefault();
             // TODO: Do this gracefully, process.CloseMainWindow() won't do the trick because the tray has no handle
             process?.Kill();
-            
+
             // Extract the ZIP
             Status = "Extracting Artemis files.";
             await _installationService.InstallBinaries(file, this);
@@ -131,7 +130,7 @@ namespace Artemis.Installer.Screens.Install.Steps
             // Create registry keys
             Status = "Finalizing installation.";
             _installationService.CreateInstallKey(version);
-         
+
             // Remove the install archive
             File.Delete(file);
 

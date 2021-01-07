@@ -1,7 +1,5 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Windows.Navigation;
 using Artemis.Installer.Screens.Abstract;
 using Artemis.Installer.Services;

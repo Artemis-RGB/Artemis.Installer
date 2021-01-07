@@ -37,7 +37,7 @@ namespace Artemis.Installer.Utilities
                 shortcut.IconLocation = iconPath;
             shortcut.Save();
         }
-            
+
         [ComImport]
         [TypeLibType(0x1040)]
         [Guid("F935DC23-1CF0-11D0-ADB9-00C04FD58A0B")]

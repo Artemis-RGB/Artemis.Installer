@@ -11,7 +11,6 @@ namespace Artemis.Installer.Services
         string InstallationDirectory { get; set; }
         List<IPrerequisite> Prerequisites { get; }
         List<string> Args { get; set; }
-        bool IsUnattended { get; }
         bool RemoveAppData { get; set; }
         bool RemoveInstallationDirectoryOnShutdown { get; set; }
 

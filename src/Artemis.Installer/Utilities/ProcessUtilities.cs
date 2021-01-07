@@ -116,14 +116,14 @@ namespace Artemis.Installer.Utilities
                 CloseHandle(hPrimaryToken);
                 CloseHandle(hShellProcess);
             }
-
         }
 
         #region Interop
 
         private struct TOKEN_PRIVILEGES
         {
-            public UInt32 PrivilegeCount;
+            public uint PrivilegeCount;
+
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1)]
             public LUID_AND_ATTRIBUTES[] Privileges;
         }
@@ -132,14 +132,14 @@ namespace Artemis.Installer.Utilities
         private struct LUID_AND_ATTRIBUTES
         {
             public LUID Luid;
-            public UInt32 Attributes;
+            public uint Attributes;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         private struct LUID
         {
-            public uint LowPart;
-            public int HighPart;
+            public readonly uint LowPart;
+            public readonly int HighPart;
         }
 
         [Flags]
@@ -177,33 +177,33 @@ namespace Artemis.Installer.Utilities
         [StructLayout(LayoutKind.Sequential)]
         private struct PROCESS_INFORMATION
         {
-            public IntPtr hProcess;
-            public IntPtr hThread;
-            public int dwProcessId;
-            public int dwThreadId;
+            public readonly IntPtr hProcess;
+            public readonly IntPtr hThread;
+            public readonly int dwProcessId;
+            public readonly int dwThreadId;
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         private struct STARTUPINFO
         {
-            public Int32 cb;
-            public string lpReserved;
-            public string lpDesktop;
-            public string lpTitle;
-            public Int32 dwX;
-            public Int32 dwY;
-            public Int32 dwXSize;
-            public Int32 dwYSize;
-            public Int32 dwXCountChars;
-            public Int32 dwYCountChars;
-            public Int32 dwFillAttribute;
-            public Int32 dwFlags;
-            public Int16 wShowWindow;
-            public Int16 cbReserved2;
-            public IntPtr lpReserved2;
-            public IntPtr hStdInput;
-            public IntPtr hStdOutput;
-            public IntPtr hStdError;
+            public readonly int cb;
+            public readonly string lpReserved;
+            public readonly string lpDesktop;
+            public readonly string lpTitle;
+            public readonly int dwX;
+            public readonly int dwY;
+            public readonly int dwXSize;
+            public readonly int dwYSize;
+            public readonly int dwXCountChars;
+            public readonly int dwYCountChars;
+            public readonly int dwFillAttribute;
+            public readonly int dwFlags;
+            public readonly short wShowWindow;
+            public readonly short cbReserved2;
+            public readonly IntPtr lpReserved2;
+            public readonly IntPtr hStdInput;
+            public readonly IntPtr hStdOutput;
+            public readonly IntPtr hStdError;
         }
 
         [DllImport("kernel32.dll", ExactSpelling = true)]
@@ -233,10 +233,12 @@ namespace Artemis.Installer.Utilities
         private static extern IntPtr OpenProcess(ProcessAccessFlags processAccess, bool bInheritHandle, uint processId);
 
         [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern bool DuplicateTokenEx(IntPtr hExistingToken, uint dwDesiredAccess, IntPtr lpTokenAttributes, SECURITY_IMPERSONATION_LEVEL impersonationLevel, TOKEN_TYPE tokenType, out IntPtr phNewToken);
+        private static extern bool DuplicateTokenEx(IntPtr hExistingToken, uint dwDesiredAccess, IntPtr lpTokenAttributes, SECURITY_IMPERSONATION_LEVEL impersonationLevel, TOKEN_TYPE tokenType,
+            out IntPtr phNewToken);
 
         [DllImport("advapi32", SetLastError = true, CharSet = CharSet.Unicode)]
-        private static extern bool CreateProcessWithTokenW(IntPtr hToken, int dwLogonFlags, string lpApplicationName, string lpCommandLine, int dwCreationFlags, IntPtr lpEnvironment, string lpCurrentDirectory, [In] ref STARTUPINFO lpStartupInfo, out PROCESS_INFORMATION lpProcessInformation);
+        private static extern bool CreateProcessWithTokenW(IntPtr hToken, int dwLogonFlags, string lpApplicationName, string lpCommandLine, int dwCreationFlags, IntPtr lpEnvironment,
+            string lpCurrentDirectory, [In] ref STARTUPINFO lpStartupInfo, out PROCESS_INFORMATION lpProcessInformation);
 
         #endregion
     }

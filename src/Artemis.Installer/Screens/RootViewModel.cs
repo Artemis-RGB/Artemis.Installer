@@ -1,6 +1,4 @@
 ﻿using System.Diagnostics;
-using System.IO;
-using System.Reflection;
 using Artemis.Installer.Services;
 using Stylet;
 
@@ -9,14 +7,14 @@ namespace Artemis.Installer.Screens
     public class RootViewModel : Conductor<Screen>
     {
         private readonly AttendedViewModel _attendedViewModel;
+        private readonly AutoUpdateViewModel _autoUpdateViewModel;
         private readonly IInstallationService _installationService;
-        private readonly UnattendedViewModel _unattendedViewModel;
 
-        public RootViewModel(IInstallationService installationService, AttendedViewModel attendedViewModel, UnattendedViewModel unattendedViewModel)
+        public RootViewModel(IInstallationService installationService, AttendedViewModel attendedViewModel, AutoUpdateViewModel autoUpdateViewModel)
         {
             _installationService = installationService;
             _attendedViewModel = attendedViewModel;
-            _unattendedViewModel = unattendedViewModel;
+            _autoUpdateViewModel = autoUpdateViewModel;
         }
 
         #region Overrides of Screen
@@ -24,8 +22,8 @@ namespace Artemis.Installer.Screens
         /// <inheritdoc />
         protected override void OnInitialActivate()
         {
-            if (_installationService.IsUnattended)
-                ActiveItem = _unattendedViewModel;
+            if (_installationService.Args.Contains("-autoupdate"))
+                ActiveItem = _autoUpdateViewModel;
             else
                 ActiveItem = _attendedViewModel;
 
@@ -39,7 +37,6 @@ namespace Artemis.Installer.Screens
         {
             ActiveItem.Closed -= ActiveItemOnClosed;
             if (_installationService.RemoveInstallationDirectoryOnShutdown)
-            {
                 Process.Start(new ProcessStartInfo
                 {
                     Arguments = $"/C PING -n 2 127.0.0.1>nul & RMDIR /Q /S \"{_installationService.InstallationDirectory}\"",
@@ -47,7 +44,6 @@ namespace Artemis.Installer.Screens
                     CreateNoWindow = true,
                     FileName = "cmd.exe"
                 });
-            }
 
             RequestClose();
         }

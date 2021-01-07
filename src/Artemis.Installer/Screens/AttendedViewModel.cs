@@ -19,7 +19,7 @@ namespace Artemis.Installer.Screens
             _installViewModel = installViewModel;
             _modifyViewModel = modifyViewModel;
             _uninstallViewModel = uninstallViewModel;
-            
+
             _installViewModel.Closed += ChildOnClosed;
             _uninstallViewModel.Closed += ChildOnClosed;
         }
@@ -38,18 +38,19 @@ namespace Artemis.Installer.Screens
         {
             if (_installationService.GetInstallKey() == null)
                 ActiveItem = _installViewModel;
+            else if (_installationService.Args.Contains("-uninstall"))
+                ActiveItem = _uninstallViewModel;
             else
                 ActiveItem = _modifyViewModel;
 
             base.OnInitialActivate();
         }
-        
+
         private void ChildOnClosed(object sender, CloseEventArgs e)
         {
             _installViewModel.Closed -= ChildOnClosed;
             _uninstallViewModel.Closed -= ChildOnClosed;
             RequestClose();
         }
-
     }
 }

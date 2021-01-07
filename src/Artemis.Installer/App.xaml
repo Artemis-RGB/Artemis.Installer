@@ -26,7 +26,7 @@
 
             <!-- Some general convertes etc. -->
             <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-            
+
             <FontFamily x:Key="RobotoMono">pack://application:,,,/Resources/Fonts/#Roboto Mono</FontFamily>
 
             <!-- Disable tab stop/focusable on all content controls -->
