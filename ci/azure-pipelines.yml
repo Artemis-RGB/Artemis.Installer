@@ -39,5 +39,9 @@ steps:
     filePatterns: '**/Artemis.Installer.exe'
     remoteDirectory: '/builds.artemis-rgb.com/binaries'
     clean: false
+    cleanContents: false
     preservePaths: true
     trustSSL: false
+    customCmds: |
+      CWD /builds.artemis-rgb.com/binaries
+      DELE Artemis.Installer.exe
