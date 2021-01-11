@@ -27,12 +27,12 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="0.14.0" />
     <PackageReference Include="Costura.Fody" Version="4.1.0" />
     <PackageReference Include="FluentValidation" Version="9.3.0" />
     <PackageReference Include="MaterialDesignColors" Version="1.2.7" />
     <PackageReference Include="MaterialDesignExtensions" Version="3.3.0-a01" />
     <PackageReference Include="MaterialDesignThemes" Version="3.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Ookii.Dialogs.Wpf" Version="3.1.0" />
     <PackageReference Include="Stylet" Version="1.3.5" />
     <PackageReference Include="Stylet.Start" Version="1.3.5" />
