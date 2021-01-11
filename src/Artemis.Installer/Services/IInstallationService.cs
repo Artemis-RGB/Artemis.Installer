@@ -20,7 +20,7 @@ namespace Artemis.Installer.Services
         Task<string> GetBinariesVersion(string branch = "master");
         Task<string> DownloadBinaries(string version, IDownloadable downloadable, string branch = "master");
         Task InstallBinaries(string file, IDownloadable downloadable);
-        Task UninstallBinaries(IDownloadable downloadable);
+        Task UninstallBinaries(IDownloadable downloadable, bool onlyDelete);
 
         RegistryKey GetInstallKey();
         void CreateInstallKey(string version, string branch = "master");

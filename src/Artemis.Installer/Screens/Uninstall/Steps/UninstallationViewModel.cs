@@ -53,7 +53,7 @@ namespace Artemis.Installer.Screens.Uninstall.Steps
             }
 
             Status = "Removing application files.";
-            await _installationService.UninstallBinaries(this);
+            await _installationService.UninstallBinaries(this, false);
             Status = "Cleaning up registry.";
             _installationService.RemoveInstallKey();
             Status = "Removing shortcuts.";

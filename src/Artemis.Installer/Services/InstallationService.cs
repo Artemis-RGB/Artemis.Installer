@@ -206,31 +206,33 @@ namespace Artemis.Installer.Services
             );
         }
 
-        public async Task UninstallBinaries(IDownloadable downloadable)
+        public async Task UninstallBinaries(IDownloadable downloadable, bool onlyDelete)
         {
             string source = Assembly.GetEntryAssembly().Location;
-            string target = Path.Combine(InstallationDirectory, "Installer", "Artemis.Installer.exe");
-            bool runningFromInstallDir = source == target;
 
             // Get all the files recursively as our total
             string[] files = Directory.GetFiles(InstallationDirectory, "*", SearchOption.AllDirectories);
 
-            // Delete all files
+            // Delete all files except the installer
             await Task.Run(() =>
             {
                 int index = 0;
                 foreach (string file in files)
                 {
-                    if (file != source) File.Delete(file);
+                    if (file != source)
+                        File.Delete(file);
 
                     index++;
                     downloadable.ReportProgress(index, files.Length, index / (float) files.Length * 100);
                 }
             });
+            downloadable.ReportProgress(0, 0, 100);
+
+            if (onlyDelete)
+                return;
 
             // Delete the folder itself after the installer closes
             RemoveInstallationDirectoryOnShutdown = true;
-            downloadable.ReportProgress(0, 0, 100);
 
             // If needed, repeat for app data
             if (RemoveAppData)
