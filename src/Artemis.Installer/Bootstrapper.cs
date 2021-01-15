@@ -12,9 +12,6 @@ namespace Artemis.Installer
 {
     public class Bootstrapper : Bootstrapper<RootViewModel>
     {
-        #region Overrides of Bootstrapper<RootViewModel>
-
-        /// <inheritdoc />
         protected override void ConfigureIoC(IStyletIoCBuilder builder)
         {
             // View related stuff
@@ -32,17 +29,10 @@ namespace Artemis.Installer
             base.ConfigureIoC(builder);
         }
 
-        #region Overrides of BootstrapperBase
-
-        /// <inheritdoc />
         protected override void Configure()
         {
             Container.Get<IInstallationService>().Args = Args.ToList();
             base.Configure();
         }
-
-        #endregion
-
-        #endregion
     }
 }
