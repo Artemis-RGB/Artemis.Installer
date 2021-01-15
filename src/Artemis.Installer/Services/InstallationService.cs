@@ -7,20 +7,18 @@ using System.Net.Http;
 using System.Reflection;
 using System.Security.AccessControl;
 using System.Security.Principal;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using AngleSharp;
-using AngleSharp.Dom;
-using AngleSharp.Html.Dom;
 using Artemis.Installer.Extensions;
 using Artemis.Installer.Services.Prerequisites;
 using Artemis.Installer.Utilities;
 using Microsoft.Win32;
+using Newtonsoft.Json.Linq;
 
 namespace Artemis.Installer.Services
 {
     public class InstallationService : IInstallationService
     {
+        private const string ApiUrl = "https://dev.azure.com/artemis-rgb/Artemis/_apis/";
         private readonly string _artemisStartMenuDirectory;
 
         public InstallationService(IEnumerable<IPrerequisite> prerequisites)
@@ -114,18 +112,28 @@ namespace Artemis.Installer.Services
 
         public async Task<string> GetBinariesVersion(string branch)
         {
-            // Directory list
-            IConfiguration config = Configuration.Default.WithDefaultLoader();
-            IBrowsingContext context = BrowsingContext.New(config);
-            IDocument document = await context.OpenAsync($"https://builds.artemis-rgb.com/binaries/{branch}/");
+            string latestBuildUrl = ApiUrl + $"build/builds?api-version=6.1-preview.6&definitions=1&branchName={branch}&resultFilter=succeeded&$top=1";
 
-            Regex hrefRegex = new Regex("^\\d*.\\d*\\/");
+            // Make the request
+            using (HttpClient client = new HttpClient())
+            {
+                HttpResponseMessage httpResponseMessage = await client.GetAsync(latestBuildUrl);
 
-            IHtmlAnchorElement anchor = document.All.Where(e => e is IHtmlAnchorElement)
-                .Cast<IHtmlAnchorElement>()
-                .Where(a => hrefRegex.IsMatch(a.InnerHtml))
-                .OrderByDescending(a => a.InnerHtml).FirstOrDefault();
-            return anchor?.InnerHtml?.TrimEnd('/');
+                // Ensure it returned correctly
+                if (!httpResponseMessage.IsSuccessStatusCode) return null;
+
+                // Parse the response
+                string response = await httpResponseMessage.Content.ReadAsStringAsync();
+                try
+                {
+                    JToken buildNumberToken = JObject.Parse(response).SelectToken("value[0].buildNumber");
+                    return buildNumberToken?.Value<string>();
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
         }
 
         public async Task<string> DownloadBinaries(string version, IDownloadable downloadable, string branch)
@@ -133,6 +141,9 @@ namespace Artemis.Installer.Services
             string file = Path.GetTempFileName();
             File.Move(file, file.Replace(".tmp", ".zip"));
             file = file.Replace(".tmp", ".zip");
+
+            // Remove the refs/heads/ prefix since that's not a thing on the binaries page atm
+            branch = branch.Replace("refs/heads/", "");
 
             using (FileStream fileStream = new FileStream(file, FileMode.Open))
             {
@@ -206,31 +217,33 @@ namespace Artemis.Installer.Services
             );
         }
 
-        public async Task UninstallBinaries(IDownloadable downloadable)
+        public async Task UninstallBinaries(IDownloadable downloadable, bool onlyDelete)
         {
             string source = Assembly.GetEntryAssembly().Location;
-            string target = Path.Combine(InstallationDirectory, "Installer", "Artemis.Installer.exe");
-            bool runningFromInstallDir = source == target;
 
             // Get all the files recursively as our total
             string[] files = Directory.GetFiles(InstallationDirectory, "*", SearchOption.AllDirectories);
 
-            // Delete all files
+            // Delete all files except the installer
             await Task.Run(() =>
             {
                 int index = 0;
                 foreach (string file in files)
                 {
-                    if (file != source) File.Delete(file);
+                    if (file != source)
+                        File.Delete(file);
 
                     index++;
                     downloadable.ReportProgress(index, files.Length, index / (float) files.Length * 100);
                 }
             });
+            downloadable.ReportProgress(0, 0, 100);
+
+            if (onlyDelete)
+                return;
 
             // Delete the folder itself after the installer closes
             RemoveInstallationDirectoryOnShutdown = true;
-            downloadable.ReportProgress(0, 0, 100);
 
             // If needed, repeat for app data
             if (RemoveAppData)

@@ -2,15 +2,6 @@
   "version": 1,
   "dependencies": {
     ".NETFramework,Version=v4.7.2": {
-      "AngleSharp": {
-        "type": "Direct",
-        "requested": "[0.14.0, )",
-        "resolved": "0.14.0",
-        "contentHash": "34w9I7nyszfEYBY8g7T3B0AtWlOivNh+QoWc3KECRwbmcNyqWmb4huihtmpH2Ds7rIRRHMMPv9yfPBxxjBn03g==",
-        "dependencies": {
-          "System.Text.Encoding.CodePages": "4.5.0"
-        }
-      },
       "Costura.Fody": {
         "type": "Direct",
         "requested": "[4.1.0, )",
@@ -50,6 +41,12 @@
         "dependencies": {
           "MaterialDesignColors": "[1.2.7, 2.0.0)"
         }
+      },
+      "Newtonsoft.Json": {
+        "type": "Direct",
+        "requested": "[12.0.3, )",
+        "resolved": "12.0.3",
+        "contentHash": "6mgjfnRB4jKMlzHSl+VD+oUc1IebOZabkbyWj2RiTgWwYPPuaK1H97G1sHqGwPlS5npiF5Q0OrxN1wni2n5QWg=="
       },
       "Ookii.Dialogs.Wpf": {
         "type": "Direct",

@@ -126,7 +126,11 @@ namespace Artemis.Installer.Screens.Install.Steps
                 process.Kill();
                 await Task.Delay(2000);
             }
-
+            
+            // Remove existing binaries
+            Status = "Removing old files.";
+            await _installationService.UninstallBinaries(this, true);
+            
             // Extract the ZIP
             Status = "Extracting Artemis files.";
             await _installationService.InstallBinaries(file, this);
