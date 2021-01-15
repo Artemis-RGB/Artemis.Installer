@@ -64,6 +64,12 @@ namespace Artemis.Installer.Services
         {
             // Get all the files recursively as our total
             string directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Artemis");
+            if (!Directory.Exists(directory))
+            {
+                downloadable.ReportProgress(0, 0, 100);
+                return;
+            }
+
             string[] files = Directory.GetFiles(directory, "*", SearchOption.AllDirectories);
 
             // Delete all files
@@ -221,22 +227,25 @@ namespace Artemis.Installer.Services
         {
             string source = Assembly.GetEntryAssembly().Location;
 
-            // Get all the files recursively as our total
-            string[] files = Directory.GetFiles(InstallationDirectory, "*", SearchOption.AllDirectories);
-
-            // Delete all files except the installer
-            await Task.Run(() =>
+            if (Directory.Exists(InstallationDirectory))
             {
-                int index = 0;
-                foreach (string file in files)
+                // Get all the files recursively as our total
+                string[] files = Directory.GetFiles(InstallationDirectory, "*", SearchOption.AllDirectories);
+                // Delete all files except the installer
+                await Task.Run(() =>
                 {
-                    if (file != source)
-                        File.Delete(file);
+                    int index = 0;
+                    foreach (string file in files)
+                    {
+                        if (file != source)
+                            File.Delete(file);
 
-                    index++;
-                    downloadable.ReportProgress(index, files.Length, index / (float) files.Length * 100);
-                }
-            });
+                        index++;
+                        downloadable.ReportProgress(index, files.Length, index / (float) files.Length * 100);
+                    }
+                });
+            }
+
             downloadable.ReportProgress(0, 0, 100);
 
             if (onlyDelete)
