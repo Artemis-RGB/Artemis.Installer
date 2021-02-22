@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Security.AccessControl;
+using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Artemis.Installer.Extensions;
@@ -151,14 +153,37 @@ namespace Artemis.Installer.Services
             // Remove the refs/heads/ prefix since that's not a thing on the binaries page atm
             branch = branch.Replace("refs/heads/", "");
 
-            using (FileStream fileStream = new FileStream(file, FileMode.Open))
+            using (HttpClient httpClient = new HttpClient())
             {
-                using (HttpClient httpClient = new HttpClient())
+                // Download archive
+                using (FileStream fileStream = new FileStream(file, FileMode.Open))
                 {
                     await httpClient.DownloadAsync($"https://builds.artemis-rgb.com/binaries/{branch}/{version}/artemis-build.zip", fileStream, downloadable);
-                    return file;
                 }
+
+                // Validate SHA256 hash
+                HttpResponseMessage result = await httpClient.GetAsync($"https://builds.artemis-rgb.com/binaries/{branch}/{version}/hash.txt");
+                // This build has no hash yet
+                if (result.StatusCode == HttpStatusCode.NotFound)
+                    return file;
+                if (!result.IsSuccessStatusCode)
+                    throw new Exception($"Failed to retrieve file hash, status code {result.StatusCode}");
+
+                string hash = (await result.Content.ReadAsStringAsync()).Trim();
+                string computedHash;
+                using (SHA256 sha256 = SHA256.Create())
+                {
+                    using (FileStream fileStream = File.OpenRead(file))
+                    {
+                        computedHash = BitConverter.ToString(sha256.ComputeHash(fileStream)).Replace("-", string.Empty);
+                    }
+                }
+
+                if (!hash.Equals(computedHash))
+                    throw new Exception("Download hash mismatch, this means the downloaded files are corrupt, please try again.");
             }
+
+            return file;
         }
 
         public async Task InstallBinaries(string file, IDownloadable downloadable)

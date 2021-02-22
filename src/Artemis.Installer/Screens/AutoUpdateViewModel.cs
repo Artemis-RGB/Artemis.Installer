@@ -182,6 +182,7 @@ namespace Artemis.Installer.Screens
             InstallStatus = null;
             IsDownloading = true;
             string file = await _installationService.DownloadBinaries(version, this);
+
             IsDownloading = false;
 
             if (Cancelled())
@@ -193,7 +194,7 @@ namespace Artemis.Installer.Screens
             CanCancel = false;
 
             // Remove existing binaries
-            Status = "Removing old files.";
+            InstallStatus = "Removing old files.";
             await _installationService.UninstallBinaries(this, true);
 
             // Extract the ZIP
