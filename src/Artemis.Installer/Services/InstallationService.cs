@@ -29,6 +29,7 @@ namespace Artemis.Installer.Services
             InstallationDirectory = installKey != null
                 ? installKey.GetValue("InstallLocation").ToString()
                 : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Artemis");
+            DataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Artemis");
 
             Prerequisites = prerequisites.ToList();
 
@@ -72,6 +73,7 @@ namespace Artemis.Installer.Services
                 return;
             }
 
+            string source = Assembly.GetEntryAssembly().Location;
             string[] files = Directory.GetFiles(directory, "*", SearchOption.AllDirectories);
 
             // Delete all files
@@ -80,15 +82,14 @@ namespace Artemis.Installer.Services
                 int index = 0;
                 foreach (string file in files)
                 {
-                    File.Delete(file);
+                    if (file != source)
+                        File.Delete(file);
 
                     index++;
                     downloadable.ReportProgress(index, files.Length, index / (float) files.Length * 100);
                 }
             });
-
-            // Delete the folder itself
-            Directory.Delete(directory, true);
+            
             downloadable.ReportProgress(0, 0, 100);
         }
 
@@ -188,7 +189,7 @@ namespace Artemis.Installer.Services
 
         public async Task InstallBinaries(string file, IDownloadable downloadable)
         {
-            RemoveInstallationDirectoryOnShutdown = false;
+            RemoveInstallerOnShutdown = false;
             using (FileStream fileStream = new FileStream(file, FileMode.Open))
             {
                 ZipArchive archive = new ZipArchive(fileStream);
@@ -217,7 +218,7 @@ namespace Artemis.Installer.Services
 
             // Copy installer
             string source = Assembly.GetEntryAssembly().Location;
-            string target = Path.Combine(InstallationDirectory, "Installer", "Artemis.Installer.exe");
+            string target = Path.Combine(DataDirectory, "installer", "Artemis.Installer.exe");
             if (source != target)
             {
                 CreateDirectoryForFile(target);
@@ -270,14 +271,16 @@ namespace Artemis.Installer.Services
                     }
                 });
             }
+            if (Directory.Exists(InstallationDirectory))
+                Directory.Delete(InstallationDirectory, true);
 
             downloadable.ReportProgress(0, 0, 100);
 
             if (onlyDelete)
                 return;
 
-            // Delete the folder itself after the installer closes
-            RemoveInstallationDirectoryOnShutdown = true;
+            // Delete the installer itself after it closes
+            RemoveInstallerOnShutdown = true;
 
             // If needed, repeat for app data
             if (RemoveAppData)
@@ -304,8 +307,8 @@ namespace Artemis.Installer.Services
             key.SetValue("HelpLink", "https://wiki.artemis-rgb.com", RegistryValueKind.String);
             key.SetValue("InstallLocation", InstallationDirectory, RegistryValueKind.String);
             key.SetValue("Publisher", "Artemis RGB", RegistryValueKind.String);
-            key.SetValue("UninstallString", $"\"{Path.Combine(InstallationDirectory, "Installer", "Artemis.Installer.exe")}\" -uninstall", RegistryValueKind.String);
-            key.SetValue("ModifyPath", $"\"{Path.Combine(InstallationDirectory, "Installer", "Artemis.Installer.exe")}\"", RegistryValueKind.String);
+            key.SetValue("UninstallString", $"\"{Path.Combine(DataDirectory, "installer", "Artemis.Installer.exe")}\" -uninstall", RegistryValueKind.String);
+            key.SetValue("ModifyPath", $"\"{Path.Combine(DataDirectory, "installer", "Artemis.Installer.exe")}\"", RegistryValueKind.String);
             key.SetValue("URLInfoAbout", "https://artemis-rgb.com", RegistryValueKind.String);
             key.SetValue("Branch", branch, RegistryValueKind.String);
 
@@ -336,7 +339,8 @@ namespace Artemis.Installer.Services
         public List<string> Args { get; set; }
         public List<IPrerequisite> Prerequisites { get; }
         public string InstallationDirectory { get; set; }
+        public string DataDirectory { get; }
         public bool RemoveAppData { get; set; }
-        public bool RemoveInstallationDirectoryOnShutdown { get; set; }
+        public bool RemoveInstallerOnShutdown { get; set; }
     }
 }

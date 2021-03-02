@@ -9,11 +9,12 @@ namespace Artemis.Installer.Services
     public interface IInstallationService
     {
         string InstallationDirectory { get; set; }
+        string DataDirectory { get; }
         List<IPrerequisite> Prerequisites { get; }
         List<string> Args { get; set; }
         bool RemoveAppData { get; set; }
-        bool RemoveInstallationDirectoryOnShutdown { get; set; }
-
+        bool RemoveInstallerOnShutdown { get; set; }
+        
         Task<string> DownloadPrerequisite(IPrerequisite prerequisite);
         Task InstallPrerequisite(IPrerequisite prerequisite, string file);
 
