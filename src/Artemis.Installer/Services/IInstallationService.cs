@@ -13,7 +13,7 @@ namespace Artemis.Installer.Services
         List<IPrerequisite> Prerequisites { get; }
         List<string> Args { get; set; }
         bool RemoveAppData { get; set; }
-        bool RemoveInstallerOnShutdown { get; set; }
+        bool CleanUpOnShutdown { get; set; }
         
         Task<string> DownloadPrerequisite(IPrerequisite prerequisite);
         Task InstallPrerequisite(IPrerequisite prerequisite, string file);

@@ -37,7 +37,7 @@ namespace Artemis.Installer.Screens
         private void ActiveItemOnClosed(object sender, CloseEventArgs e)
         {
             ActiveItem.Closed -= ActiveItemOnClosed;
-            if (_installationService.RemoveInstallerOnShutdown)
+            if (_installationService.CleanUpOnShutdown)
             {
                 string path = _installationService.DataDirectory;
                 if (!_installationService.RemoveAppData)
@@ -46,8 +46,16 @@ namespace Artemis.Installer.Screens
                 Process.Start(new ProcessStartInfo
                 {
                     Arguments = $"/C PING -n 2 127.0.0.1>nul & RMDIR /Q /S \"{path}\"",
-                    // WindowStyle = ProcessWindowStyle.Hidden,
-                    // CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    CreateNoWindow = true,
+                    FileName = "cmd.exe"
+                });
+
+                Process.Start(new ProcessStartInfo
+                {
+                    Arguments = $"/C PING -n 2 127.0.0.1>nul & RMDIR /Q /S \"{_installationService.InstallationDirectory}\"",
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    CreateNoWindow = true,
                     FileName = "cmd.exe"
                 });
             }

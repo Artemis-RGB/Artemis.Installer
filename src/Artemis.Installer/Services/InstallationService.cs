@@ -189,7 +189,7 @@ namespace Artemis.Installer.Services
 
         public async Task InstallBinaries(string file, IDownloadable downloadable)
         {
-            RemoveInstallerOnShutdown = false;
+            CleanUpOnShutdown = false;
             using (FileStream fileStream = new FileStream(file, FileMode.Open))
             {
                 ZipArchive archive = new ZipArchive(fileStream);
@@ -271,8 +271,6 @@ namespace Artemis.Installer.Services
                     }
                 });
             }
-            if (Directory.Exists(InstallationDirectory))
-                Directory.Delete(InstallationDirectory, true);
 
             downloadable.ReportProgress(0, 0, 100);
 
@@ -280,7 +278,7 @@ namespace Artemis.Installer.Services
                 return;
 
             // Delete the installer itself after it closes
-            RemoveInstallerOnShutdown = true;
+            CleanUpOnShutdown = true;
 
             // If needed, repeat for app data
             if (RemoveAppData)
@@ -341,6 +339,6 @@ namespace Artemis.Installer.Services
         public string InstallationDirectory { get; set; }
         public string DataDirectory { get; }
         public bool RemoveAppData { get; set; }
-        public bool RemoveInstallerOnShutdown { get; set; }
+        public bool CleanUpOnShutdown { get; set; }
     }
 }
