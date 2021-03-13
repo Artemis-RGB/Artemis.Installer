@@ -41,26 +41,7 @@ namespace Artemis.Installer.Services
 
         private void CreateDirectoryForFile(string path)
         {
-            if (Directory.Exists(Path.GetDirectoryName(path)))
-                return;
-
-            DirectorySecurity ds = new DirectorySecurity();
-            ds.AddAccessRule(new FileSystemAccessRule(
-                new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null),
-                FileSystemRights.ReadAndExecute,
-                InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
-                PropagationFlags.None,
-                AccessControlType.Allow)
-            );
-            ds.AddAccessRule(new FileSystemAccessRule(
-                new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null),
-                FileSystemRights.FullControl,
-                InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
-                PropagationFlags.None,
-                AccessControlType.Allow)
-            );
-
-            Directory.CreateDirectory(Path.GetDirectoryName(path), ds);
+            GeneralUtilities.CreateAccessibleDirectory(Path.GetDirectoryName(path));
         }
 
         private async Task DeleteAppData(IDownloadable downloadable)
@@ -89,7 +70,7 @@ namespace Artemis.Installer.Services
                     downloadable.ReportProgress(index, files.Length, index / (float) files.Length * 100);
                 }
             });
-            
+
             downloadable.ReportProgress(0, 0, 100);
         }
 
@@ -190,6 +171,9 @@ namespace Artemis.Installer.Services
         public async Task InstallBinaries(string file, IDownloadable downloadable)
         {
             CleanUpOnShutdown = false;
+
+            GeneralUtilities.CreateAccessibleDirectory(DataDirectory);
+            GeneralUtilities.CreateAccessibleDirectory(InstallationDirectory);
             using (FileStream fileStream = new FileStream(file, FileMode.Open))
             {
                 ZipArchive archive = new ZipArchive(fileStream);

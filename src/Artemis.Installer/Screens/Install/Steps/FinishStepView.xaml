@@ -49,8 +49,8 @@
                     Artemis wiki
                 </Hyperlink>
                 and more specifically the
-                <Hyperlink NavigateUri="https://wiki.artemis-rgb.com/en/guides/user/introduction" RequestNavigate="{s:Action OpenHyperlink}" Style="{StaticResource ArtemisHyperlink}">
-                    getting started
+                <Hyperlink NavigateUri="https://wiki.artemis-rgb.com/guides/user" RequestNavigate="{s:Action OpenHyperlink}" Style="{StaticResource ArtemisHyperlink}">
+                    introduction
                 </Hyperlink>
                 guide
             </TextBlock>
