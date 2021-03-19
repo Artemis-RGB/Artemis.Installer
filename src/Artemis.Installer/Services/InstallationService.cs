@@ -224,7 +224,7 @@ namespace Artemis.Installer.Services
             );
             ShortcutUtilities.Create(
                 Path.Combine(_artemisStartMenuDirectory, "Uninstall Artemis.lnk"),
-                Path.Combine(InstallationDirectory, "Installer", "Artemis.Installer.exe"),
+                Path.Combine(DataDirectory, "installer", "Artemis.Installer.exe"),
                 "-uninstall",
                 InstallationDirectory,
                 "Uninstall Artemis",
