@@ -119,14 +119,8 @@ namespace Artemis.Installer.Screens.Install.Steps
             IsDownloading = false;
 
             Status = "Closing down Artemis.";
-            Process process = Process.GetProcessesByName("Artemis.UI").FirstOrDefault();
-            // TODO: Do this gracefully, process.CloseMainWindow() won't do the trick because the tray has no handle
-            if (process != null)
-            {
-                process.Kill();
-                await Task.Delay(2000);
-            }
-            
+            await _installationService.RemoteShutdown();
+
             // Remove existing binaries
             Status = "Removing old files.";
             await _installationService.UninstallBinaries(this, true);

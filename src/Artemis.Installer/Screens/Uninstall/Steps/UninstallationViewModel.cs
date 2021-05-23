@@ -44,13 +44,7 @@ namespace Artemis.Installer.Screens.Uninstall.Steps
         public async Task Uninstall()
         {
             Status = "Closing down Artemis.";
-            Process process = Process.GetProcessesByName("Artemis.UI").FirstOrDefault();
-            // TODO: Do this gracefully, process.CloseMainWindow() won't do the trick because the tray has no handle
-            if (process != null)
-            {
-                process.Kill();
-                await Task.Delay(2000);
-            }
+            await _installationService.RemoteShutdown();
 
             Status = "Removing application files.";
             await _installationService.UninstallBinaries(this, false);

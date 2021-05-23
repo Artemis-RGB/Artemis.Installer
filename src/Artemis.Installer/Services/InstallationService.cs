@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -316,6 +317,41 @@ namespace Artemis.Installer.Services
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Artemis.lnk");
             if (File.Exists(path))
                 File.Delete(path);
+        }
+
+        public async Task RemoteShutdown()
+        {
+            // It is unlikely Artemis is already running in this case, lets just check though
+            if (!File.Exists(Path.Combine(DataDirectory, "webserver.txt")))
+            {
+                KillThemAll();
+                await Task.Delay(2000);
+                return;
+            }
+
+            string url = File.ReadAllText(Path.Combine(DataDirectory, "webserver.txt"));
+            using (HttpClient client = new HttpClient())
+            {
+                await client.PostAsync(url + "remote/shutdown", null);
+                await Task.Delay(2000);
+                KillThemAll();
+            }
+        }
+
+        private void KillThemAll()
+        {
+            Process[] processes = Process.GetProcessesByName("Artemis.UI");
+            foreach (Process process in processes)
+            {
+                try
+                {
+                    process.Kill();
+                }
+                catch (Exception)
+                {
+                    // ignored I guess
+                }
+            }
         }
 
         public List<string> Args { get; set; }
