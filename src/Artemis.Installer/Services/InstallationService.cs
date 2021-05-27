@@ -321,20 +321,27 @@ namespace Artemis.Installer.Services
 
         public async Task RemoteShutdown()
         {
-            // It is unlikely Artemis is already running in this case, lets just check though
-            if (!File.Exists(Path.Combine(DataDirectory, "webserver.txt")))
+            try
             {
-                KillThemAll();
-                await Task.Delay(2000);
-                return;
-            }
+                // It is unlikely Artemis is already running in this case, lets just check though
+                if (!File.Exists(Path.Combine(DataDirectory, "webserver.txt")))
+                    return;
 
-            string url = File.ReadAllText(Path.Combine(DataDirectory, "webserver.txt"));
-            using (HttpClient client = new HttpClient())
+                string url = File.ReadAllText(Path.Combine(DataDirectory, "webserver.txt"));
+                using (HttpClient client = new HttpClient())
+                {
+                    await client.PostAsync(url + "remote/shutdown", null);
+                    await Task.Delay(2000);
+                }
+            }
+            catch
             {
-                await client.PostAsync(url + "remote/shutdown", null);
-                await Task.Delay(2000);
+                // ignored
+            }
+            finally
+            {
                 KillThemAll();
+                await Task.Delay(1000);
             }
         }
 
