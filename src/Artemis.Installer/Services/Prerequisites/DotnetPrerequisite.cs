@@ -33,8 +33,10 @@ namespace Artemis.Installer.Services.Prerequisites
             if (versionValue == null)
                 return false;
 
-            Version dotnetVersion = Version.Parse(versionValue.ToString());
-            return dotnetVersion.Major >= 5;
+            // This means we'll be false for preview versions but I'm not going down that rabbit hole anyway
+            if (Version.TryParse(versionValue.ToString(), out Version dotnetVersion))
+                return dotnetVersion.Major >= 5;
+            return false;
         }
 
         public async Task Install(string file)
