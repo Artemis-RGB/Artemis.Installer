@@ -14,10 +14,7 @@ namespace Artemis.Installer.Services.Prerequisites
 
         public string Title => ".NET 5 runtime x64";
         public string Description => "The .NET 5 runtime is required for Artemis to run, the download is about 50 MB";
-
-        public string DownloadUrl =>
-            "https://download.visualstudio.microsoft.com/download/pr/c6a74d6b-576c-4ab0-bf55-d46d45610730/" +
-            "f70d2252c9f452c2eb679b8041846466/windowsdesktop-runtime-5.0.1-win-x64.exe";
+        public string DownloadUrl => "https://download.visualstudio.microsoft.com/download/pr/2b83d30e-5c86-4d37-a1a6-582e22ac07b2/c7b1b7e21761bbfb7b9951f5b258806e/windowsdesktop-runtime-5.0.7-win-x64.exe";
 
         public bool IsDownloading { get; set; }
         public bool IsInstalling { get; set; }
