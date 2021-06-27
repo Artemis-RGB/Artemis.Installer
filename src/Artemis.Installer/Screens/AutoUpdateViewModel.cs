@@ -117,7 +117,7 @@ namespace Artemis.Installer.Screens
 
             CanCancel = true;
 
-            Status = "Closing down Artemis.";
+            Status = "Closing down Artemis in case it's running...";
             await _installationService.RemoteShutdown();
 
             if (Cancelled())

@@ -81,15 +81,23 @@ namespace Artemis.Installer.Services
             File.Move(file, file.Replace(".tmp", ".exe"));
             file = file.Replace(".tmp", ".exe");
 
-            using (FileStream fileStream = new FileStream(file, FileMode.Open))
+            try
             {
-                using (HttpClient httpClient = new HttpClient())
+                using (FileStream fileStream = new FileStream(file, FileMode.Open))
                 {
-                    prerequisite.IsDownloading = true;
-                    await httpClient.DownloadAsync(prerequisite.DownloadUrl, fileStream, prerequisite);
-                    prerequisite.IsDownloading = false;
-                    return file;
+                    using (HttpClient httpClient = new HttpClient())
+                    {
+                        prerequisite.IsDownloading = true;
+                        await httpClient.DownloadAsync(prerequisite.DownloadUrl, fileStream, prerequisite);
+                        prerequisite.IsDownloading = false;
+                        return file;
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Failed to download {prerequisite.Title} from {prerequisite.DownloadUrl}.\r\n" +
+                                    "Try installing it manually or try running the installer again.", e);
             }
         }
 
@@ -108,21 +116,30 @@ namespace Artemis.Installer.Services
             // Make the request
             using (HttpClient client = new HttpClient())
             {
-                HttpResponseMessage httpResponseMessage = await client.GetAsync(latestBuildUrl);
-
-                // Ensure it returned correctly
-                if (!httpResponseMessage.IsSuccessStatusCode) return null;
-
-                // Parse the response
-                string response = await httpResponseMessage.Content.ReadAsStringAsync();
                 try
                 {
-                    JToken buildNumberToken = JObject.Parse(response).SelectToken("value[0].buildNumber");
-                    return buildNumberToken?.Value<string>();
+                    HttpResponseMessage httpResponseMessage = await client.GetAsync(latestBuildUrl);
+                    
+                    // Ensure it returned correctly
+                    if (!httpResponseMessage.IsSuccessStatusCode) return null;
+
+                    // Parse the response
+                    string response = await httpResponseMessage.Content.ReadAsStringAsync();
+                    try
+                    {
+                        JToken buildNumberToken = JObject.Parse(response).SelectToken("value[0].buildNumber");
+                        return buildNumberToken?.Value<string>();
+                    }
+                    catch (Exception)
+                    {
+                        return null;
+                    }
                 }
-                catch (Exception)
+                catch (HttpRequestException e)
                 {
-                    return null;
+                    if (e.InnerException is WebException webException)
+                        throw new Exception($"Failed to get binaries version, please ensure you have a working internet connection.\r\n{webException.Status}", e);
+                    throw new Exception("Failed to get binaries version, please ensure you have a working internet connection.", e);
                 }
             }
         }
@@ -141,7 +158,16 @@ namespace Artemis.Installer.Services
                 // Download archive
                 using (FileStream fileStream = new FileStream(file, FileMode.Open))
                 {
-                    await httpClient.DownloadAsync($"https://builds.artemis-rgb.com/binaries/{branch}/{version}/artemis-build.zip", fileStream, downloadable);
+                    try
+                    {
+                        await httpClient.DownloadAsync($"https://builds.artemis-rgb.com/binaries/{branch}/{version}/artemis-build.zip", fileStream, downloadable);
+                    }
+                    catch (HttpRequestException e)
+                    {
+                        if (e.InnerException is WebException webException)
+                            throw new Exception($"Failed to download binaries, please ensure you have a working internet connection.\r\n{webException.Status}", e);
+                        throw new Exception("Failed to download binaries, please ensure you have a working internet connection.", e);
+                    }
                 }
 
                 // Validate SHA256 hash

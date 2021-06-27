@@ -43,7 +43,7 @@ namespace Artemis.Installer.Screens.Uninstall.Steps
 
         public async Task Uninstall()
         {
-            Status = "Closing down Artemis.";
+            Status = "Closing down Artemis in case it's running...";
             await _installationService.RemoteShutdown();
 
             Status = "Removing application files.";

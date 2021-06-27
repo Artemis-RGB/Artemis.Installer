@@ -30,7 +30,7 @@ namespace Artemis.Installer
                 dialog.WindowTitle = "Artemis installer";
                 dialog.MainInstruction = "Unfortunately the installer ran into an unhandled exception and cannot continue.";
                 dialog.Content = exception.Message;
-                dialog.ExpandedInformation = exception.StackTrace.Trim();
+                dialog.ExpandedInformation = exception.ToStringDemystified();
 
                 dialog.CollapsedControlText = "Show stack trace";
                 dialog.ExpandedControlText = "Hide stack trace";
@@ -48,7 +48,7 @@ namespace Artemis.Installer
                 {
                     if (args.Item == copyButton)
                     {
-                        Clipboard.SetText(exception.ToString());
+                        Clipboard.SetText(exception.ToStringDemystified());
                         args.Cancel = true;
                     }
                 };

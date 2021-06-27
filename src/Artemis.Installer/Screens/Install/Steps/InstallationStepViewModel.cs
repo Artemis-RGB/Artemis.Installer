@@ -118,7 +118,7 @@ namespace Artemis.Installer.Screens.Install.Steps
             string file = await _installationService.DownloadBinaries(version, this);
             IsDownloading = false;
 
-            Status = "Closing down Artemis.";
+            Status = "Closing down Artemis in case it's running...";
             await _installationService.RemoteShutdown();
 
             // Remove existing binaries
