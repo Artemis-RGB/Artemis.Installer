@@ -14,7 +14,7 @@ namespace Artemis.Installer.Services.Prerequisites
 
         public string Title => ".NET 5 runtime x64";
         public string Description => "The .NET 5 runtime is required for Artemis to run, the download is about 50 MB";
-        public string DownloadUrl => "https://download.visualstudio.microsoft.com/download/pr/2b83d30e-5c86-4d37-a1a6-582e22ac07b2/c7b1b7e21761bbfb7b9951f5b258806e/windowsdesktop-runtime-5.0.7-win-x64.exe";
+        public string DownloadUrl => "https://download.visualstudio.microsoft.com/download/pr/78fa839b-2d86-4ece-9d97-5b9fe6fb66fa/10d406c0d247470daa80691d3b3460a6/windowsdesktop-runtime-5.0.10-win-x64.exe";
 
         public bool IsDownloading { get; set; }
         public bool IsInstalling { get; set; }
@@ -30,8 +30,8 @@ namespace Artemis.Installer.Services.Prerequisites
             if (versionValue == null)
                 return false;
 
-            // This means we'll be false for preview versions but I'm not going down that rabbit hole anyway
-            if (Version.TryParse(versionValue.ToString(), out Version dotnetVersion))
+            // Splitting on '-' because of semver values like 6.0.0-rc.1.21451.13 which Version.TryParse can't handle
+            if (Version.TryParse(versionValue.ToString().Split('-')[0], out Version dotnetVersion))
                 return dotnetVersion.Major >= 5;
             return false;
         }
