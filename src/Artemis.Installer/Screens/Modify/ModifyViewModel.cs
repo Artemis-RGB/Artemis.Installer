@@ -1,9 +1,19 @@
-﻿using Stylet;
+﻿using System.Threading.Tasks;
+using Artemis.Installer.Services;
+using MaterialDesignExtensions.Controls;
+using Stylet;
 
 namespace Artemis.Installer.Screens.Modify
 {
     public class ModifyViewModel : Screen
     {
+        private readonly IInstallationService _installationService;
+
+        public ModifyViewModel(IInstallationService installationService)
+        {
+            _installationService = installationService;
+        }
+
         private bool _installSelected;
         private bool _uninstallSelected;
 
@@ -29,9 +39,28 @@ namespace Artemis.Installer.Screens.Modify
 
         public bool CanContinue => InstallSelected || UninstallSelected;
 
-        public void Continue()
+        public async Task Continue()
         {
+            if (InstallSelected && !await ShowWpfWarning())
+                return;
+
             ((AttendedViewModel) Parent).ModifyChoiceSelected();
+        }
+
+        private async Task<bool> ShowWpfWarning()
+        {
+            if (!_installationService.IsWpfVersionInstalled())
+                return true;
+            
+            ConfirmationDialogArguments dialogArgs = new ConfirmationDialogArguments
+            {
+                Title = "Upgrading from WPF to Avalonia",
+                Message = "It looks like you are upgrading to a major new Artemis update.\r\n" +
+                          "THIS WILL WIPE ALL YOUR SETTINGS AND PROFILES.",
+                OkButtonLabel = "OK, WIPE MY SETTINGS AND PROFILES",
+                CancelButtonLabel = "CANCEL"
+            };
+            return await ConfirmationDialog.ShowDialogAsync("RootDialogHost", dialogArgs);
         }
 
         public void Cancel()

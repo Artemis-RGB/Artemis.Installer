@@ -2,6 +2,10 @@
   "profiles": {
     "Artemis.Installer": {
       "commandName": "Project"
+    },
+    "Artemis.Installer autoupdate": {
+      "commandName": "Project",
+      "commandLineArgs": "-autoupdate"
     }
   }
 }

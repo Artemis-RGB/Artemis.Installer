@@ -29,5 +29,6 @@ namespace Artemis.Installer.Services
         void RemoveInstallKey();
         void CreateDesktopShortcut();
         void RemoveDesktopShortcut();
+        bool IsWpfVersionInstalled();
     }
 }

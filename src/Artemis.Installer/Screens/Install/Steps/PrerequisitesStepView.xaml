@@ -54,6 +54,8 @@
                            Grid.ColumnSpan="2"
                            VerticalAlignment="Bottom"
                            Continue="CONTINUE"
+                           Cancel="CANCEL"
+                           CancelCommand="{s:Action Cancel}"
                            Back="BACK"
                            IsContinueEnabled="{Binding CanContinue}" />
     </Grid>
