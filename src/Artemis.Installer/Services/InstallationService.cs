@@ -160,7 +160,7 @@ namespace Artemis.Installer.Services
                 {
                     try
                     {
-                        await httpClient.DownloadAsync($"https://builds.artemis-rgb.com/binaries/{branch}/{version}/artemis-build.zip", fileStream, downloadable);
+                        await httpClient.DownloadAsync($"https://builds.artemis-rgb.com/binaries/{branch}/{version}/artemis-build-windows.zip", fileStream, downloadable);
                     }
                     catch (HttpRequestException e)
                     {
@@ -171,7 +171,7 @@ namespace Artemis.Installer.Services
                 }
 
                 // Validate SHA256 hash
-                HttpResponseMessage result = await httpClient.GetAsync($"https://builds.artemis-rgb.com/binaries/{branch}/{version}/hash.txt");
+                HttpResponseMessage result = await httpClient.GetAsync($"https://builds.artemis-rgb.com/binaries/{branch}/{version}/hash-windows.txt");
                 // This build has no hash yet
                 if (result.StatusCode == HttpStatusCode.NotFound)
                     return file;
