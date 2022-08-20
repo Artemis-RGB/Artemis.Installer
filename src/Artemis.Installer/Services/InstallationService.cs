@@ -242,7 +242,7 @@ namespace Artemis.Installer.Services
 
             ShortcutUtilities.Create(
                 Path.Combine(_artemisStartMenuDirectory, "Artemis.lnk"),
-                Path.Combine(InstallationDirectory, "Artemis.UI.exe"),
+                Path.Combine(InstallationDirectory, "Artemis.UI.Windows.exe"),
                 "",
                 InstallationDirectory,
                 "Artemis",
@@ -310,7 +310,7 @@ namespace Artemis.Installer.Services
             RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Artemis 2", true) ??
                               Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Artemis 2", true);
 
-            key.SetValue("DisplayIcon", Path.Combine(InstallationDirectory, "Artemis.UI.exe"), RegistryValueKind.String);
+            key.SetValue("DisplayIcon", Path.Combine(InstallationDirectory, "Artemis.UI.Windows.exe"), RegistryValueKind.String);
             key.SetValue("DisplayName", "Artemis 2", RegistryValueKind.String);
             key.SetValue("DisplayVersion", version, RegistryValueKind.String);
             key.SetValue("HelpLink", "https://wiki.artemis-rgb.com", RegistryValueKind.String);
@@ -334,7 +334,7 @@ namespace Artemis.Installer.Services
         public void CreateDesktopShortcut()
         {
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Artemis.lnk");
-            ShortcutUtilities.Create(path, Path.Combine(InstallationDirectory, "Artemis.UI.exe"), "", InstallationDirectory, "Artemis", "", "");
+            ShortcutUtilities.Create(path, Path.Combine(InstallationDirectory, "Artemis.UI.Windows.exe"), "", InstallationDirectory, "Artemis", "", "");
         }
 
         /// <inheritdoc />
@@ -343,6 +343,19 @@ namespace Artemis.Installer.Services
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Artemis.lnk");
             if (File.Exists(path))
                 File.Delete(path);
+        }
+
+        public bool IsWpfVersionInstalled()
+        {
+            RegistryKey installKey = GetInstallKey();
+            if (installKey == null)
+                return false;
+
+            string version = installKey.GetValue("DisplayVersion").ToString();
+            if (!int.TryParse(version.Split('.')[0], out int major))
+                return false;
+
+            return major <= 20220715;
         }
 
         public async Task RemoteShutdown()

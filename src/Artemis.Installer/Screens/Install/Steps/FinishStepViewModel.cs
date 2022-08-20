@@ -49,7 +49,7 @@ namespace Artemis.Installer.Screens.Install.Steps
                 _installationService.CreateDesktopShortcut();
             if (StartArtemis)
             {
-                string executable = Path.Combine(_installationService.InstallationDirectory, "Artemis.UI.exe");
+                string executable = Path.Combine(_installationService.InstallationDirectory, "Artemis.UI.Windows.exe");
                 ProcessUtilities.RunAsDesktopUser(executable);
             }
 

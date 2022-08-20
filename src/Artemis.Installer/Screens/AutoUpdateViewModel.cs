@@ -115,6 +115,10 @@ namespace Artemis.Installer.Screens
             float steps = 2;
             float step = 0;
 
+            await ShowWpfWarning();
+            if (Cancelled())
+                return;
+
             CanCancel = true;
 
             Status = "Closing down Artemis in case it's running...";
@@ -207,7 +211,7 @@ namespace Artemis.Installer.Screens
             InstallStatus = "Installation finished.";
 
             await Task.Delay(TimeSpan.FromSeconds(1));
-            string executable = Path.Combine(_installationService.InstallationDirectory, "Artemis.UI.exe");
+            string executable = Path.Combine(_installationService.InstallationDirectory, "Artemis.UI.Windows.exe");
             ProcessUtilities.RunAsDesktopUser(executable);
 
             // RequestClose also closes Artemis..?
@@ -215,10 +219,27 @@ namespace Artemis.Installer.Screens
             Application.Current.Shutdown(1);
         }
 
+        private async Task ShowWpfWarning()
+        {
+            if (!_installationService.IsWpfVersionInstalled())
+                return;
+
+            ConfirmationDialogArguments dialogArgs = new ConfirmationDialogArguments
+            {
+                Title = "Upgrading from WPF to Avalonia",
+                Message = "It looks like you are upgrading to a major new Artemis update.\r\n" +
+                          "THIS WILL WIPE ALL YOUR SETTINGS AND PROFILES.",
+                OkButtonLabel = "OK, WIPE MY SETTINGS AND PROFILES",
+                CancelButtonLabel = "CANCEL"
+            };
+            _cancelled = !await ConfirmationDialog.ShowDialogAsync("RootDialogHost", dialogArgs);
+        }
+
         private bool Cancelled()
         {
+            // By the time the user clicks CLOSE, the caller should have cleaned up
             if (_cancelled)
-                // By the time the user clicks CLOSE, the caller should have cleaned up
+            {
                 Execute.PostToUIThreadAsync(async () =>
                 {
                     AlertDialogArguments dialogArgs = new AlertDialogArguments
@@ -231,6 +252,7 @@ namespace Artemis.Installer.Screens
                     await AlertDialog.ShowDialogAsync("RootDialogHost", dialogArgs);
                     Application.Current.Shutdown(1);
                 });
+            }
 
             return _cancelled;
         }
