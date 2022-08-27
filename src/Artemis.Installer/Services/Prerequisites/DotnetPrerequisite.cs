@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Artemis.Installer.Utilities;
-using Microsoft.Win32;
 
 namespace Artemis.Installer.Services.Prerequisites
 {
@@ -25,15 +27,34 @@ namespace Artemis.Installer.Services.Prerequisites
 
         public bool IsMet()
         {
-            RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedhost");
-            object versionValue = key?.GetValue("Version");
-            if (versionValue == null)
-                return false;
+            ProcessStartInfo processInfo = new ProcessStartInfo
+            {
+                FileName = "dotnet.exe",
+                Arguments = "--list-runtimes",
+                UseShellExecute = false,
+                RedirectStandardOutput = true
+            };
+            try
+            {
+                Process process = Process.Start(processInfo);
+                if (process == null)
+                    return false;
 
-            // Splitting on '-' because of semver values like 6.0.0-rc.1.21451.13 which Version.TryParse can't handle
-            if (Version.TryParse(versionValue.ToString().Split('-')[0], out Version dotnetVersion))
-                return dotnetVersion.Major >= 6;
-            return false;
+                process.WaitForExit();
+                string versions = process.StandardOutput.ReadToEnd();
+
+                // Any version between 6 and 9 is fine for now
+                MatchCollection matches = Regex.Matches(versions, @"Microsoft\.WindowsDesktop\.App ([6-9].\d*.\d*).*");
+
+                return matches.Count > 0;
+            }
+            catch (Win32Exception e)
+            {
+                // File not found
+                if (e.NativeErrorCode == 2)
+                    return false;
+                throw;
+            }
         }
 
         public async Task Install(string file)
