@@ -44,9 +44,7 @@ namespace Artemis.Installer.Services.Prerequisites
                 string versions = process.StandardOutput.ReadToEnd();
 
                 // Any version between 6 and 9 is fine for now
-                MatchCollection matches = Regex.Matches(versions, @"Microsoft\.WindowsDesktop\.App ([6-9].\d*.\d*).*");
-
-                return matches.Count > 0;
+                return Regex.IsMatch(versions, @"Microsoft\.WindowsDesktop\.App ([6-9].\d*.\d*).*");
             }
             catch (Win32Exception e)
             {
