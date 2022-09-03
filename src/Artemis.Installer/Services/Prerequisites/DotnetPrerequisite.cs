@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Artemis.Installer.Utilities;
+using Microsoft.Win32;
 
 namespace Artemis.Installer.Services.Prerequisites
 {
@@ -26,6 +27,27 @@ namespace Artemis.Installer.Services.Prerequisites
         public float DownloadPercentage { get; private set; }
 
         public bool IsMet()
+        {
+            // Unfortunately neither approach is foolproof, hopefully this will cover most cases.
+            return IsFoundByDotnetCli() || IsFoundInRegistry();
+        }
+
+        public async Task Install(string file)
+        {
+            await ProcessUtilities.RunProcessAsync(file, "-passive");
+        }
+
+        public void ReportProgress(long currentBytes, long totalBytes, float percentage)
+        {
+            DownloadCurrentBytes = currentBytes;
+            DownloadTotalBytes = totalBytes;
+            DownloadPercentage = percentage;
+            OnDownloadProgressUpdated();
+        }
+
+        public event EventHandler DownloadProgressUpdated;
+        
+        private bool IsFoundByDotnetCli()
         {
             ProcessStartInfo processInfo = new ProcessStartInfo
             {
@@ -54,20 +76,18 @@ namespace Artemis.Installer.Services.Prerequisites
                 throw;
             }
         }
-
-        public async Task Install(string file)
+        
+        private bool IsFoundInRegistry()
         {
-            await ProcessUtilities.RunProcessAsync(file, "-passive");
-        }
+            RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedhost");
+            object versionValue = key?.GetValue("Version");
+            if (versionValue == null)
+                return false;
 
-        public void ReportProgress(long currentBytes, long totalBytes, float percentage)
-        {
-            DownloadCurrentBytes = currentBytes;
-            DownloadTotalBytes = totalBytes;
-            DownloadPercentage = percentage;
-            OnDownloadProgressUpdated();
+            // Splitting on '-' because of semver values like 6.0.0-rc.1.21451.13 which Version.TryParse can't handle
+            if (Version.TryParse(versionValue.ToString().Split('-')[0], out Version dotnetVersion))
+                return dotnetVersion.Major >= 6;
+            return false;
         }
-
-        public event EventHandler DownloadProgressUpdated;
     }
 }
