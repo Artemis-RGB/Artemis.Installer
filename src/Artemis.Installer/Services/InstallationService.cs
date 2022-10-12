@@ -386,7 +386,7 @@ namespace Artemis.Installer.Services
 
         private void KillThemAll()
         {
-            Process[] processes = Process.GetProcessesByName("Artemis.UI");
+            Process[] processes = Process.GetProcessesByName("Artemis.UI.Windows");
             foreach (Process process in processes)
             {
                 try
