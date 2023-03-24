@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Windows;
-using System.Windows.Navigation;
 using System.Windows.Threading;
 using Ookii.Dialogs.Wpf;
 
@@ -15,6 +14,16 @@ namespace Artemis.Installer
         public App()
         {
             Current.DispatcherUnhandledException += CurrentOnDispatcherUnhandledException;
+        }
+
+        public void OpenHyperlink(object sender, HyperlinkClickedEventArgs e)
+        {
+            ProcessStartInfo processInfo = new ProcessStartInfo
+            {
+                FileName = e.Href,
+                UseShellExecute = true
+            };
+            Process.Start(processInfo);
         }
 
         private void CurrentOnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
@@ -55,17 +64,8 @@ namespace Artemis.Installer
 
                 dialog.ShowDialog(Current.MainWindow);
             }
-            Current.Shutdown(1);
-        }
 
-        public void OpenHyperlink(object sender, HyperlinkClickedEventArgs e)
-        {
-            ProcessStartInfo processInfo = new ProcessStartInfo
-            {
-                FileName = e.Href,
-                UseShellExecute = true
-            };
-            Process.Start(processInfo);
+            Current.Shutdown(1);
         }
     }
 }

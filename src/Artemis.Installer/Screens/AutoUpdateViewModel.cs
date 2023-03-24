@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using Artemis.Installer.Screens.Install.Prerequisites;
 using Artemis.Installer.Services;
 using Artemis.Installer.Utilities;
 using MaterialDesignExtensions.Controls;
@@ -16,7 +12,6 @@ namespace Artemis.Installer.Screens
     public class AutoUpdateViewModel : Screen, IDownloadable
     {
         private readonly IInstallationService _installationService;
-        private PrerequisiteViewModel _activePrerequisite;
         private bool _canCancel;
         private bool _cancelled;
         private double _downloadCurrent;
@@ -32,18 +27,6 @@ namespace Artemis.Installer.Screens
         {
             _installationService = installationService;
         }
-
-        public PrerequisiteViewModel ActivePrerequisite
-        {
-            get => _activePrerequisite;
-            set
-            {
-                SetAndNotify(ref _activePrerequisite, value);
-                NotifyOfPropertyChange(nameof(IsPrerequisiteActive));
-            }
-        }
-
-        public bool IsPrerequisiteActive => ActivePrerequisite != null;
 
         public bool CanCancel
         {
@@ -127,51 +110,9 @@ namespace Artemis.Installer.Screens
             if (Cancelled())
                 return;
 
-            Status = "Downloading & installing missing prerequisites.";
-            // Get all prerequisites that aren't met
-            List<PrerequisiteViewModel> prerequisites = _installationService.Prerequisites
-                .Where(p => !p.IsMet())
-                .Select(p => new PrerequisiteViewModel(_installationService, p))
-                .ToList();
-
-            steps += prerequisites.Count;
-            foreach (PrerequisiteViewModel prerequisiteViewModel in prerequisites)
-            {
-                ActivePrerequisite = prerequisiteViewModel;
-                string prerequisiteFile = await prerequisiteViewModel.Download();
-
-                if (Cancelled())
-                {
-                    File.Delete(prerequisiteFile);
-                    return;
-                }
-
-                await prerequisiteViewModel.Install(prerequisiteFile);
-                if (Cancelled())
-                    return;
-
-                step++;
-                ProcessPercentage = step / steps * 100f;
-            }
-
             step++;
             ProcessPercentage = step / steps * 100f;
             Status = "Downloading & installing latest Artemis build.";
-
-            InstallStatus = "Retrieving latest Artemis build number.";
-            string version = await _installationService.GetBinariesVersion();
-            if (version == null)
-            {
-                AlertDialogArguments dialogArgs = new AlertDialogArguments
-                {
-                    Title = "No binaries found",
-                    Message = "We couldn't find a valid Artemis download, setup cannot continue.",
-                    OkButtonLabel = "CLOSE :("
-                };
-
-                await AlertDialog.ShowDialogAsync("RootDialogHost", dialogArgs);
-                Application.Current.Shutdown(1);
-            }
 
             if (Cancelled())
                 return;
@@ -179,7 +120,7 @@ namespace Artemis.Installer.Screens
             // Download the file
             InstallStatus = null;
             IsDownloading = true;
-            string file = await _installationService.DownloadBinaries(version, this);
+            string file = await _installationService.DownloadBinaries(this);
 
             IsDownloading = false;
 
@@ -201,7 +142,7 @@ namespace Artemis.Installer.Screens
 
             // Create registry keys
             InstallStatus = "Finalizing installation.";
-            _installationService.CreateInstallKey(version);
+            _installationService.CreateInstallKey();
 
             // Remove the install archive
             File.Delete(file);
@@ -239,7 +180,6 @@ namespace Artemis.Installer.Screens
         {
             // By the time the user clicks CLOSE, the caller should have cleaned up
             if (_cancelled)
-            {
                 Execute.PostToUIThreadAsync(async () =>
                 {
                     AlertDialogArguments dialogArgs = new AlertDialogArguments
@@ -252,7 +192,6 @@ namespace Artemis.Installer.Screens
                     await AlertDialog.ShowDialogAsync("RootDialogHost", dialogArgs);
                     Application.Current.Shutdown(1);
                 });
-            }
 
             return _cancelled;
         }

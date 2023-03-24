@@ -2,7 +2,6 @@
 using Artemis.Installer.Screens;
 using Artemis.Installer.Screens.Abstract;
 using Artemis.Installer.Services;
-using Artemis.Installer.Services.Prerequisites;
 using Artemis.Installer.Stylet;
 using FluentValidation;
 using Stylet;
@@ -17,7 +16,6 @@ namespace Artemis.Installer
             // View related stuff
             builder.Bind<InstallStepViewModel>().ToAllImplementations();
             builder.Bind<UninstallStepViewModel>().ToAllImplementations();
-            builder.Bind(typeof(IPrerequisite)).ToAllImplementations();
 
             // Services
             builder.Bind<IInstallationService>().To<InstallationService>().InSingletonScope();

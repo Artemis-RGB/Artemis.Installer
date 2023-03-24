@@ -1,13 +1,9 @@
-﻿using System.Diagnostics;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Windows;
 using Artemis.Installer.Screens.Abstract;
 using Artemis.Installer.Services;
 using Artemis.Installer.Utilities;
-using MaterialDesignExtensions.Controls;
 using Stylet;
 
 namespace Artemis.Installer.Screens.Install.Steps
@@ -96,26 +92,9 @@ namespace Artemis.Installer.Screens.Install.Steps
 
         private async Task Install()
         {
-            Status = "Retrieving latest Artemis build number.";
-            string version = await _installationService.GetBinariesVersion();
-
-            if (version == null)
-            {
-                AlertDialogArguments dialogArgs = new AlertDialogArguments
-                {
-                    Title = "No binaries found",
-                    Message = "We couldn't find a valid Artemis download, setup cannot continue.",
-                    OkButtonLabel = "CLOSE :("
-                };
-
-                await AlertDialog.ShowDialogAsync("RootDialogHost", dialogArgs);
-                Application.Current.Shutdown(1);
-            }
-
             // Download the file
-            Status = null;
             IsDownloading = true;
-            string file = await _installationService.DownloadBinaries(version, this);
+            string file = await _installationService.DownloadBinaries(this);
             IsDownloading = false;
 
             Status = "Closing down Artemis in case it's running...";
@@ -124,14 +103,14 @@ namespace Artemis.Installer.Screens.Install.Steps
             // Remove existing binaries
             Status = "Removing old files.";
             await _installationService.UninstallBinaries(this, true);
-            
+
             // Extract the ZIP
             Status = "Extracting Artemis files.";
             await _installationService.InstallBinaries(file, this);
 
             // Create registry keys
             Status = "Finalizing installation.";
-            _installationService.CreateInstallKey(version);
+            _installationService.CreateInstallKey();
 
             // Remove the install archive
             File.Delete(file);

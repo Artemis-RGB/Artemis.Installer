@@ -9,13 +9,13 @@ namespace Artemis.Installer.Screens.Modify
     {
         private readonly IInstallationService _installationService;
 
+        private bool _installSelected;
+        private bool _uninstallSelected;
+
         public ModifyViewModel(IInstallationService installationService)
         {
             _installationService = installationService;
         }
-
-        private bool _installSelected;
-        private bool _uninstallSelected;
 
         public bool InstallSelected
         {
@@ -47,11 +47,19 @@ namespace Artemis.Installer.Screens.Modify
             ((AttendedViewModel) Parent).ModifyChoiceSelected();
         }
 
+        public void Cancel()
+        {
+            InstallSelected = false;
+            UninstallSelected = false;
+
+            ((AttendedViewModel) Parent).ModifyChoiceSelected();
+        }
+
         private async Task<bool> ShowWpfWarning()
         {
             if (!_installationService.IsWpfVersionInstalled())
                 return true;
-            
+
             ConfirmationDialogArguments dialogArgs = new ConfirmationDialogArguments
             {
                 Title = "Upgrading from WPF to Avalonia",
@@ -61,14 +69,6 @@ namespace Artemis.Installer.Screens.Modify
                 CancelButtonLabel = "CANCEL"
             };
             return await ConfirmationDialog.ShowDialogAsync("RootDialogHost", dialogArgs);
-        }
-
-        public void Cancel()
-        {
-            InstallSelected = false;
-            UninstallSelected = false;
-
-            ((AttendedViewModel) Parent).ModifyChoiceSelected();
         }
     }
 }
