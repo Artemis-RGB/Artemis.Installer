@@ -24,7 +24,7 @@
                 Click continue to get started!
             </TextBlock>
             <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Foreground="{DynamicResource MaterialDesignBodyLight}" TextWrapping="Wrap">
-                PS: The files downloaded will be about 35 MB.<LineBreak />
+                PS: The files downloaded will be about 135 MB.<LineBreak />
             </TextBlock>
         </StackPanel>
         <mde:StepButtonBar Grid.Row="1" VerticalAlignment="Bottom" Continue="CONTINUE" Cancel="CANCEL" />

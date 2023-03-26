@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Artemis.Installer.Screens.Abstract;
 using Artemis.Installer.Services;
 using Artemis.Installer.Utilities;

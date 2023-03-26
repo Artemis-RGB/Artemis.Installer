@@ -3,36 +3,29 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using System.Security.AccessControl;
 using System.Security.Cryptography;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using Artemis.Installer.Extensions;
-using Artemis.Installer.Services.Prerequisites;
 using Artemis.Installer.Utilities;
 using Microsoft.Win32;
-using Newtonsoft.Json.Linq;
 
 namespace Artemis.Installer.Services
 {
     public class InstallationService : IInstallationService
     {
-        private const string ApiUrl = "https://dev.azure.com/artemis-rgb/Artemis/_apis/";
+        private const string API_URL = "https://updating.artemis-rgb.com";
         private readonly string _artemisStartMenuDirectory;
 
-        public InstallationService(IEnumerable<IPrerequisite> prerequisites)
+        public InstallationService()
         {
             RegistryKey installKey = GetInstallKey();
             InstallationDirectory = installKey != null
                 ? installKey.GetValue("InstallLocation").ToString()
                 : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Artemis");
             DataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Artemis");
-
-            Prerequisites = prerequisites.ToList();
 
             _artemisStartMenuDirectory = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -55,7 +48,7 @@ namespace Artemis.Installer.Services
                 return;
             }
 
-            string source = Assembly.GetEntryAssembly().Location;
+            string source = Assembly.GetEntryAssembly()?.Location;
             string[] files = Directory.GetFiles(directory, "*", SearchOption.AllDirectories);
 
             // Delete all files
@@ -75,92 +68,40 @@ namespace Artemis.Installer.Services
             downloadable.ReportProgress(0, 0, 100);
         }
 
-        public async Task<string> DownloadPrerequisite(IPrerequisite prerequisite)
+        private void KillThemAll()
         {
-            string file = Path.GetTempFileName();
-            File.Move(file, file.Replace(".tmp", ".exe"));
-            file = file.Replace(".tmp", ".exe");
-
-            try
-            {
-                using (FileStream fileStream = new FileStream(file, FileMode.Open))
-                {
-                    using (HttpClient httpClient = new HttpClient())
-                    {
-                        prerequisite.IsDownloading = true;
-                        await httpClient.DownloadAsync(prerequisite.DownloadUrl, fileStream, prerequisite);
-                        prerequisite.IsDownloading = false;
-                        return file;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception($"Failed to download {prerequisite.Title} from {prerequisite.DownloadUrl}.\r\n" +
-                                    "Try installing it manually or try running the installer again.", e);
-            }
-        }
-
-        public async Task InstallPrerequisite(IPrerequisite prerequisite, string file)
-        {
-            prerequisite.IsInstalling = true;
-            await prerequisite.Install(file);
-            File.Delete(file);
-            prerequisite.IsInstalling = false;
-        }
-
-        public async Task<string> GetBinariesVersion(string branch)
-        {
-            string latestBuildUrl = ApiUrl + $"build/builds?api-version=6.1-preview.6&definitions=1&branchName={branch}&resultFilter=succeeded&$top=1";
-
-            // Make the request
-            using (HttpClient client = new HttpClient())
+            Process[] processes = Process.GetProcessesByName("Artemis.UI.Windows");
+            foreach (Process process in processes)
             {
                 try
                 {
-                    HttpResponseMessage httpResponseMessage = await client.GetAsync(latestBuildUrl);
-                    
-                    // Ensure it returned correctly
-                    if (!httpResponseMessage.IsSuccessStatusCode) return null;
-
-                    // Parse the response
-                    string response = await httpResponseMessage.Content.ReadAsStringAsync();
-                    try
-                    {
-                        JToken buildNumberToken = JObject.Parse(response).SelectToken("value[0].buildNumber");
-                        return buildNumberToken?.Value<string>();
-                    }
-                    catch (Exception)
-                    {
-                        return null;
-                    }
+                    process.Kill();
                 }
-                catch (HttpRequestException e)
+                catch (Exception)
                 {
-                    if (e.InnerException is WebException webException)
-                        throw new Exception($"Failed to get binaries version, please ensure you have a working internet connection.\r\n{webException.Status}", e);
-                    throw new Exception("Failed to get binaries version, please ensure you have a working internet connection.", e);
+                    // ignored I guess
                 }
             }
         }
 
-        public async Task<string> DownloadBinaries(string version, IDownloadable downloadable, string branch)
+        public async Task<string> DownloadBinaries(IDownloadable downloadable, string branch)
         {
             string file = Path.GetTempFileName();
             File.Move(file, file.Replace(".tmp", ".zip"));
             file = file.Replace(".tmp", ".zip");
 
-            // Remove the refs/heads/ prefix since that's not a thing on the binaries page atm
-            branch = branch.Replace("refs/heads/", "");
-
+            // Escape the branch
+            branch = Uri.EscapeDataString(branch);
             using (HttpClient httpClient = new HttpClient())
             {
+                string hash = await httpClient.GetStringAsync($"{API_URL}/api/artifacts/latest/{branch}/windows/hash");
+
                 // Download archive
                 using (FileStream fileStream = new FileStream(file, FileMode.Open))
                 {
                     try
                     {
-                        await httpClient.DownloadAsync($"https://builds.artemis-rgb.com/binaries/{branch}/{version}/artemis-build-windows.zip", fileStream, downloadable);
+                        await httpClient.DownloadAsync($"{API_URL}/api/artifacts/latest/{branch}/windows", fileStream, downloadable);
                     }
                     catch (HttpRequestException e)
                     {
@@ -168,28 +109,18 @@ namespace Artemis.Installer.Services
                             throw new Exception($"Failed to download binaries, please ensure you have a working internet connection.\r\n{webException.Status}", e);
                         throw new Exception("Failed to download binaries, please ensure you have a working internet connection.", e);
                     }
-                }
 
-                // Validate SHA256 hash
-                HttpResponseMessage result = await httpClient.GetAsync($"https://builds.artemis-rgb.com/binaries/{branch}/{version}/hash-windows.txt");
-                // This build has no hash yet
-                if (result.StatusCode == HttpStatusCode.NotFound)
-                    return file;
-                if (!result.IsSuccessStatusCode)
-                    throw new Exception($"Failed to retrieve file hash, status code {result.StatusCode}");
-
-                string hash = (await result.Content.ReadAsStringAsync()).Trim();
-                string computedHash;
-                using (SHA256 sha256 = SHA256.Create())
-                {
-                    using (FileStream fileStream = File.OpenRead(file))
+                    // Validate SHA256 hash
+                    string computedHash;
+                    fileStream.Seek(0, SeekOrigin.Begin);
+                    using (MD5 md5 = MD5.Create())
                     {
-                        computedHash = BitConverter.ToString(sha256.ComputeHash(fileStream)).Replace("-", string.Empty);
+                        computedHash = BitConverter.ToString(md5.ComputeHash(fileStream)).Replace("-", string.Empty);
                     }
-                }
 
-                if (!hash.Equals(computedHash))
-                    throw new Exception("Download hash mismatch, this means the downloaded files are corrupt, please try again.");
+                    if (!hash.Equals(computedHash))
+                        throw new Exception("Download hash mismatch, this means the downloaded files are corrupt, please try again.");
+                }
             }
 
             return file;
@@ -305,21 +236,19 @@ namespace Artemis.Installer.Services
             return Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Artemis 2", true);
         }
 
-        public void CreateInstallKey(string version, string branch)
+        public void CreateInstallKey()
         {
             RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Artemis 2", true) ??
                               Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Artemis 2", true);
 
             key.SetValue("DisplayIcon", Path.Combine(InstallationDirectory, "Artemis.UI.Windows.exe"), RegistryValueKind.String);
             key.SetValue("DisplayName", "Artemis 2", RegistryValueKind.String);
-            key.SetValue("DisplayVersion", version, RegistryValueKind.String);
             key.SetValue("HelpLink", "https://wiki.artemis-rgb.com", RegistryValueKind.String);
             key.SetValue("InstallLocation", InstallationDirectory, RegistryValueKind.String);
             key.SetValue("Publisher", "Artemis RGB", RegistryValueKind.String);
             key.SetValue("UninstallString", $"\"{Path.Combine(DataDirectory, "installer", "Artemis.Installer.exe")}\" -uninstall", RegistryValueKind.String);
             key.SetValue("ModifyPath", $"\"{Path.Combine(DataDirectory, "installer", "Artemis.Installer.exe")}\"", RegistryValueKind.String);
             key.SetValue("URLInfoAbout", "https://artemis-rgb.com", RegistryValueKind.String);
-            key.SetValue("Branch", branch, RegistryValueKind.String);
 
             key.Close();
         }
@@ -351,6 +280,9 @@ namespace Artemis.Installer.Services
             if (installKey == null)
                 return false;
 
+            object displayVersionValue = installKey.GetValue("DisplayVersion");
+            if (displayVersionValue == null)
+                return false;
             string version = installKey.GetValue("DisplayVersion").ToString();
             if (!int.TryParse(version.Split('.')[0], out int major))
                 return false;
@@ -384,24 +316,7 @@ namespace Artemis.Installer.Services
             }
         }
 
-        private void KillThemAll()
-        {
-            Process[] processes = Process.GetProcessesByName("Artemis.UI.Windows");
-            foreach (Process process in processes)
-            {
-                try
-                {
-                    process.Kill();
-                }
-                catch (Exception)
-                {
-                    // ignored I guess
-                }
-            }
-        }
-
         public List<string> Args { get; set; }
-        public List<IPrerequisite> Prerequisites { get; }
         public string InstallationDirectory { get; set; }
         public string DataDirectory { get; }
         public bool RemoveAppData { get; set; }
