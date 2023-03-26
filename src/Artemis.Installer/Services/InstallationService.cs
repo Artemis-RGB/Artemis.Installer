@@ -280,6 +280,9 @@ namespace Artemis.Installer.Services
             if (installKey == null)
                 return false;
 
+            object displayVersionValue = installKey.GetValue("DisplayVersion");
+            if (displayVersionValue == null)
+                return false;
             string version = installKey.GetValue("DisplayVersion").ToString();
             if (!int.TryParse(version.Split('.')[0], out int major))
                 return false;

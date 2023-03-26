@@ -13,7 +13,7 @@ namespace Artemis.Installer.Services
         bool RemoveAppData { get; set; }
         bool CleanUpOnShutdown { get; set; }
 
-        Task<string> DownloadBinaries(IDownloadable downloadable, string branch = "feature/gh-actions");
+        Task<string> DownloadBinaries(IDownloadable downloadable, string branch = "master");
         Task InstallBinaries(string file, IDownloadable downloadable);
         Task UninstallBinaries(IDownloadable downloadable, bool onlyDelete);
         Task RemoteShutdown();
